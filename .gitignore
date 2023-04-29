@@ -2,3 +2,4 @@ venv/
 Backend/DATABASE/config.json
 Backend/DATABASE/configurations.py
 Backend/DATABASE/DigiCertGlobalRootCA.crt.pem
+__pycache__
