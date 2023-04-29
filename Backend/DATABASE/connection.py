@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, MetaData
 import os
 import json
 
-with open("./config.json") as f:
+with open(os.path.dirname(__file__), "config.json") as f:
     config = json.load(f)
 
 username = config["database_username"]
