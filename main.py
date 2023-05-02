@@ -38,6 +38,9 @@ def createAdmin(admin: Administrators_Schemas.Administrator_CreateAccount_IN, db
     dbAdmin = ta.getAdminbyEmail(db, email=admin.email)
     if dbAdmin:
         raise HTTPException(status_code=400, detail="Email already registered")
+    dbAdmin = ta.getAdminbyUserName(db, username=admin.userName.get_secret_value())
+    if dbAdmin:
+        raise HTTPException(status_code=400, detail="User Name already registered")
     return ta.createAdmin(db=db, admin=admin)
 
 @app.post("/Content/AdminLogin/")

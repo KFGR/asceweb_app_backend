@@ -50,6 +50,8 @@ class __Administrator_Basic_IN(Schema):
             raise ValueError("The Password must have at least eight (8) characters.")
         if value.get_secret_value().islower() or value.get_secret_value().isupper():
             raise ValueError("A Password must have both upper - case and lower - case characters.")
+        if not(value.get_secret_value().isalnum()):
+            raise ValueError("A Password must have numbers and letters.")
         return value
 
 '''

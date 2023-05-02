@@ -15,6 +15,9 @@ def getAdmins(db: Session):
 def getAdminbyEmail(db: Session, email: str):
     return db.query(Administrators_Table).filter(Administrators_Table.email == email).first()
 
+def getAdminbyUserName(db: Session, username: str):
+    return db.query(Administrators_Table).filter(Administrators_Table.username == username).first()
+
 def createAdmin(db: Session, admin: adminSchema.Administrator_CreateAccount_OUT):
     dbAdmin = Administrators_Table(name=admin.name, email=admin.email, username=admin.userName.get_secret_value(), password=__sc.encrypt(admin.passwd.get_secret_value()), admin_level=admin.adminLevel,created_at=admin.createdAt, updated_at=admin.updatedAt)
     db.add(dbAdmin)
