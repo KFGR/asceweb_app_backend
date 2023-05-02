@@ -1,6 +1,7 @@
 from pydantic import BaseModel as Schema, ValidationError, validator, root_validator, EmailStr, SecretStr
 import datetime as dt
 
+
 '''
     ----------------------------------------------------------------
                     SCHEMAS FOR INPUTING DATA
@@ -11,6 +12,7 @@ import datetime as dt
 
     It handles the inputs for userName and passwd
 '''
+
 class __Administrator_Basic_IN(Schema):
     userName: SecretStr
     passwd: SecretStr
@@ -120,8 +122,8 @@ class Administrator_LookAccount_IN(Schema):
 '''
 
 class Administrator_CreateAccount_OUT(Schema):
-    userName: SecretStr.get_secret_value()
-    passwd: SecretStr.get_secret_value()
+    userName: SecretStr
+    passwd: SecretStr
     name: str
     email: EmailStr
     adminLevel: str
@@ -138,7 +140,7 @@ class Administrator_CreateAccount_OUT(Schema):
 class Administrator_LookAccount_OUT(Schema):
     idAdministrators: int
     name: str
-    userName: SecretStr.get_secret_value()
+    userName: str
     email: EmailStr
     adminLevel: str
     createdAt: dt.datetime
