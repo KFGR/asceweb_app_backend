@@ -120,6 +120,7 @@ class Administrator_AskID(Schema):
     ----------------------------------------------------------------------------
                             Response Models
     ----------------------------------------------------------------------------
+    This data is to be outputed to table
 '''
 
 class Administrator_CreateAccount_OUT(Schema):
