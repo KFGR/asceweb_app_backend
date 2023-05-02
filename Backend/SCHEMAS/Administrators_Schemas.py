@@ -50,8 +50,8 @@ class __Administrator_Basic_IN(Schema):
             raise ValueError("The Password must have at least eight (8) characters.")
         if value.get_secret_value().islower() or value.get_secret_value().isupper():
             raise ValueError("A Password must have both upper - case and lower - case characters.")
-        if not(value.get_secret_value().isalnum()):
-            raise ValueError("A Password must have numbers and letters.")
+        if all(v.isalnum() or v in ('!', '@', '#', '$', '%', '&') for v in value.get_secret_value()) == False:
+            raise ValueError("A Password must have numbers, letters and symbols.")
         return value
 
 '''
@@ -164,8 +164,8 @@ if __name__ == "__main__":
         First local test to check if all values to create an admin account are parsed correctly.
     '''
     try:
-        admin1 = Administrator_CreateAccount_IN(userName="Pepe112", passwd="Everyone313", name="Pepe The Frog", email="pepe@gmail.com", adminLevel="GA")
-        admin2 = Administrator_CreateAccount_IN(userName="Pepe221", passwd="12", name=" ", email="datapp.com", adminLevel="LA")
+        admin1 = Administrator_CreateAccount_IN(userName="Pepe112", passwd="Every#one313", name="Pepe The Frog", email="pepe@gmail.com", adminLevel="GA")
+        admin2 = Administrator_CreateAccount_IN(userName="Pepe221", passwd="12pPpppppppp", name=" ", email="datapp.com", adminLevel="LA")
         #   looking = Administrator_LookAccount(idAdministrators=-1)
     except ValidationError as e:
         print(e)
