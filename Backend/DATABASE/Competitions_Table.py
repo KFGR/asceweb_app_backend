@@ -1,17 +1,18 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, DateTime, Text
+from sqlalchemy import Column, ForeignKey, Integer, String, Enum, Text
 from sqlalchemy.orm import relationship
 from Backend.CONFIG.connection import Base
 
-class competitions(Base):
+class Competitions_Table(Base):
     """This class contains the code for the administrators table"""
     __tablename__ = 'competitions'
 
     #Creating the relation between the columns of each table
     idchapter_members = Column(Integer, ForeignKey('chapter_members.idchapter_members'))
+    name = Column(String(55), ForeignKey('chapter_members.name'))
+    email = Column(String(100), ForeignKey('chapter_members.email'))
+    phone = Column(String(15), ForeignKey('chapter_memebers.phone'))
     chapter_members = relationship("chapter_members", backref="competitions")
-    name = Column(String(55), nullable=False)
-    email = Column(String(100), unique=True, nullable=False)
-    phone = Column(String(15), unique=True, nullable=False)
+    
     ascemembership = Column(Integer, unique=True, nullable=False)
     competition_name = Column(String(100), nullable=False)
     courses = Column(Text, nullable=False)

@@ -1,10 +1,10 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Enum, DateTime
+from sqlalchemy import Column, Integer, String, Enum, DATETIME
 from sqlalchemy.orm import relationship
 from Backend.CONFIG.connection import Base
 
-class chapter_members(Base):
+class Chapter_Members_Table(Base):
     """This class represents the table that contains all the members of the student chapter"""
-    __tablename__ = 'chapter_members'
+    _tablename_ = 'chapter_members'
 
     idchapter_members = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(55), nullable=False)
@@ -15,7 +15,6 @@ class chapter_members(Base):
     bachelor = Column(String(100), nullable=False)
     department = Column(String(100), nullable=False)
     type = Column(Enum('Member','Admin'), nullable=False) #Por defaul debe ser Members
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DATETIME, nullable=False)
     competitions_form = Column(Enum('Yes','No'), nullable=False)
-
 
