@@ -88,7 +88,7 @@ class Administrator_CreateAccount_IN(__Administrator_Basic_IN):    #   ACCOUNT C
     
     Only require userName and passwd
 '''
-class Administrator_LoginAccount(__Administrator_Basic_IN):
+class Administrator_LoginAccount_IN(__Administrator_Basic_IN):
     
     updatedAt: dt.datetime = dt.datetime.now()
     
@@ -100,12 +100,11 @@ class Administrator_LoginAccount(__Administrator_Basic_IN):
     Do not know if this is to be used; however this is for inputting the ID of an admin account.
     The next class is to return the values of such account.
 '''
-class Administrator_LookAccount_IN(Schema):
+class Administrator_AskID(Schema):
     idAdministrators: int
 
     @validator('idAdministrators', allow_reuse=True)
     def isIDAdmin(cls, value: int):
-        print(value)
         if value < 0:
             raise ValueError("The given value of Admin ID is negative.")
         if value > 4294967295:
@@ -132,19 +131,26 @@ class Administrator_CreateAccount_OUT(Schema):
 
     class Config:
         orm_mode = True
-    
 
 '''
     These are all the values that should be returned if an admin account is returnd.
 '''
 class Administrator_LookAccount_OUT(Schema):
     idAdministrators: int
-    name: str
     userName: str
+    password: str
+    name: str
     email: EmailStr
     adminLevel: str
     createdAt: dt.datetime
     updatedAt: dt.datetime
+
+    class Config:
+        orm_mode = True
+
+class Administrator_LoginAccount_OUT(Schema):
+    userName: SecretStr
+    password: SecretStr
 
     class Config:
         orm_mode = True

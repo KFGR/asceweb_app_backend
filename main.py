@@ -33,14 +33,21 @@ def get_db():
     finally:
         db.close()
 
-@app.post("/Content/AdminCreate", response_model=Administrators_Schemas.Administrator_CreateAccount_OUT)
+@app.post("/Content/AdminCreate/", response_model=Administrators_Schemas.Administrator_CreateAccount_OUT)
 def createAdmin(admin: Administrators_Schemas.Administrator_CreateAccount_IN, db: Session = Depends(get_db)):
     dbAdmin = ta.getAdminbyEmail(db, email=admin.email)
     if dbAdmin:
         raise HTTPException(status_code=400, detail="Email already registered")
     return ta.createAdmin(db=db, admin=admin)
 
-@app.get("/Admins/")
-def read_users(db: Session = Depends(get_db)) -> list[Administrators_Schemas.Administrator_LookAccount_OUT]:
-    admins = ta.getAdmins(db)
-    return admins
+@app.post("/Content/AdminLogin/")
+def loginAdmin(admin: Administrators_Schemas.Administrator_LoginAccount_IN, db: Session = Depends(get_db)) -> bool:
+    dbAdmin = ta.loginAdmin(db,admin=admin)
+    if dbAdmin == False:
+        raise HTTPException(status_code=401, detail="Wrong User Name or Password")
+    return dbAdmin
+
+@app.get("/Content/Admins/")
+def getAdmins(db: Session = Depends(get_db)) -> list[Administrators_Schemas.Administrator_LookAccount_OUT]:
+    dbAdmins = ta.getAdmins(db)
+    return dbAdmins
