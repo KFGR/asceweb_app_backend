@@ -15,6 +15,7 @@ dbname = os.getenv("db_name")#config["database_name"]
 pem_file = os.getenv("db_pem")#config["database_pem"]
 ssl_arg = {"ssl_ca":pem_file}
 
+
 # Creating engine to connect to the database in Azure
 engine = create_engine(f"mysql+pymysql://{username}:{password}@{hostname}:{port}/{dbname}", connect_args=ssl_arg)
 
