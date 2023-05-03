@@ -7,15 +7,14 @@ import json
 # with open("Backend/CONFIG/config.json") as f:
 #     config = json.load(f)
 
-username = os.getenv('database_username')#config["database_username"]
-password = os.getenv("database_password")#config["database_password"]
-hostname = os.getenv("database_hostname")#config["database_hostname"]
-port = os.getenv("database_port")#config["database_port"]
-dbname = os.getenv("database_name")#config["database_name"]
-pem_file = os.getenv("database_pem")#config["database_pem"]
+username = os.getenv('db_username')#config["database_username"]
+password = os.getenv("db_password")#config["database_password"]
+hostname = os.getenv("db_host")#config["database_hostname"]
+port = os.getenv("db_port")#config["database_port"]
+dbname = os.getenv("db_name")#config["database_name"]
+pem_file = os.getenv("db_pem")#config["database_pem"]
 ssl_arg = {"ssl_ca":pem_file}
-# ola = [username, password, hostname, port, dbname, pem_file]
-# print(ola)
+
 # Creating engine to connect to the database in Azure
 engine = create_engine(f"mysql+pymysql://{username}:{password}@{hostname}:{port}/{dbname}", connect_args=ssl_arg)
 
