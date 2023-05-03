@@ -10,9 +10,9 @@ password = os.getenv("db_password")#config["database_password"]
 hostname = os.getenv("db_host")#config["database_hostname"]
 port = os.getenv("db_port")#config["database_port"]
 dbname = os.getenv("db_name")#config["database_name"]
-# pem_file = os.getenv("db_pem")#config["database_pem"]
-pemm_file = os.getenv("dbpem")
-ssl_arg = {"ssl_ca":pemm_file}
+pem_file = os.getenv("db_pem")#config["database_pem"]
+# pemm_file = os.getenv("dbpem")
+ssl_arg = {"ssl_ca":pem_file}
 
 
 # Creating engine to connect to the database in Azure
