@@ -35,7 +35,7 @@ def get_db():
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"Hello": "World this is a message"}
 
 @app.post("/Content/AdminCreate/", response_model=Administrators_Schemas.Administrator_CreateAccount_OUT)
 def createAdmin(admin: Administrators_Schemas.Administrator_CreateAccount_IN, db: Session = Depends(get_db)):
