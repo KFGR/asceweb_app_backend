@@ -4,7 +4,7 @@ from Backend.CONFIG.connection import Base
 
 class Chapter_Members_Table(Base):
     """This class represents the table that contains all the members of the student chapter"""
-    _tablename_ = 'chapter_members'
+    __tablename__ = 'chapter_members'
 
     idchapter_members = Column(Integer, primary_key=True, autoincrement=True)
     name = Column(String(55), nullable=False)

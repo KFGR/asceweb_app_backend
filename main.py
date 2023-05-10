@@ -15,8 +15,10 @@ from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from Backend.TESTS import Test_Admins as ta
-from Backend.SCHEMAS import Administrators_Schemas
+from Backend.TESTS import SignUp_Test
+from Backend.SCHEMAS import Administrators_Schemas, SignUp_Schemas
 from Backend.CONFIG.connection import engine, Base, SessionLocal
+from starlette.status import HTTP_204_NO_CONTENT, HTTP_401_UNAUTHORIZED, HTTP_200_OK
 from pydantic import ValidationError
 # chapter_members.Base.metadata.create_all(bind=connection.engine)
 Base.metadata.create_all(bind = engine)
@@ -159,22 +161,22 @@ def deleteAdmin(masterAdminToken: str, db:Session = Depends(get_db)):
         else: return {"status_code":404, 'body':"Invalid {}".format(str(e).split()[1])}
 
 
-# @app.post("/ascepupr/signupchapter/", status_code=HTTP_200_OK, response_model=SignUp_Schemas.output_Schema)
-# def val(name: str, email: str, phone:str, tshirt_size: str, age: int, bachelor:str, department: str, Academic_Years: int, db: Session = Depends(get_db)):
-#     try:
-#         user = SignUp_Schemas.set_SignUp_Data(name=name, email=email, phone=phone, tshirt_size=tshirt_size, age=age, bachelor=bachelor, department=department, aca_years=Academic_Years)
-#         data = SignUp_Test.put_SignUp_Data(db=db,user=user)
-#         print('this is data: ', data)
-#         return {'status_code':data[0], 'body': data[1]}
-#     except (ValidationError, ValueError, Exception) as e:
-#         return {'status_code':400, 'body':"Invalid {}".format(str(e).split('\n')[1])}
+@app.post("/ascepupr/signupchapter/", status_code=HTTP_200_OK, response_model=SignUp_Schemas.output_Schema)
+def val(name: str, email: str, phone:str, tshirt_size: str, age: int, bachelor:str, department: str, Academic_Years: int, db: Session = Depends(get_db)):
+    try:
+        user = SignUp_Schemas.set_SignUp_Data(name=name, email=email, phone=phone, tshirt_size=tshirt_size, age=age, bachelor=bachelor, department=department, aca_years=Academic_Years)
+        data = SignUp_Test.put_SignUp_Data(db=db,user=user)
+        print('this is data: ', data)
+        return {'status_code':data[0], 'body': data[1]}
+    except (ValidationError, ValueError, Exception) as e:
+        return {'status_code':400, 'body':"Invalid {}".format(str(e).split('\n')[1])}
     
-# @app.get("/ascepupr/dashboard/table/memberstable/", status_code=HTTP_200_OK, response_model=SignUp_Schemas.output_Schema)
-# def get_members(db: Session = Depends(get_db)):
-#     try:
-#         return {"status_code":200, "body": SignUp_Test.get_SignUp_Table(db=db)}
-#     except Exception as e:
-#         return{"status_code": 400, "body":"Bad request"}
+@app.get("/ascepupr/dashboard/table/memberstable/", status_code=HTTP_200_OK, response_model=SignUp_Schemas.output_Schema)
+def get_members(db: Session = Depends(get_db)):
+    try:
+        return {"status_code":200, "body": SignUp_Test.get_SignUp_Table(db=db)}
+    except Exception as e:
+        return{"status_code": 400, "body":"Bad request"}
     
 
 if __name__ == "__main__":
