@@ -17,4 +17,4 @@ class Chapter_Members_Table(Base):
     type = Column(Enum('Member','Admin'), nullable=False) #Por defaul debe ser Members
     created_at = Column(DATETIME, nullable=False)
     competitions_form = Column(Enum('Yes','No'), nullable=False)
-
+    aca_years = Column(Integer, nullable=False)
