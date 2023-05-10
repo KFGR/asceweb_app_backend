@@ -177,6 +177,8 @@ def get_members(db: Session = Depends(get_db)):
         return {"status_code":200, "body": SignUp_Test.get_SignUp_Table(db=db)}
     except Exception as e:
         return{"status_code": 400, "body":"Bad request"}
+    
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
