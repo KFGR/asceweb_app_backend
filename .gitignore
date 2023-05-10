@@ -2,4 +2,5 @@ venv/
 __pycache__
 config.json
 configurations.py
-DigiCertGlobalRootCA.crt.pem
+# DigiCertGlobalRootCA.crt.pem
+Chapter_Members_Schemas.py
