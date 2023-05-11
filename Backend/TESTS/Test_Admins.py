@@ -228,7 +228,7 @@ def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminTo
     raise Exception('No data was found')
 
 def updateMembers(db: Session, user=adminSchema. Member_upate_table):
-    admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
+    admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(user.masterAdminToken)['username']).first()
     if admin_user:
         pass
     else:
