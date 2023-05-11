@@ -9,11 +9,14 @@ class __Members_Inputs(Schema):
     name: str
     email: EmailStr
     phone: str
-    tshirt_size: str
-    age: int
-    bachelor: str
-    department: str
-    aca_years: int
+    ascemembership: str
+    competition_name: str
+    courses: str
+    daily_availability: str
+    travel_availability: str
+    older_than_twentyfive: str
+    heavy_driver: str
+    official_driver: str
 
     @validator('*', allow_reuse=True, pre=True)
     def isEmpty(cls, value: str | datetime):
@@ -36,7 +39,7 @@ class __Members_Inputs(Schema):
             raise ValidationError("Invalid email")
         return value
     
-    @validator('age', allow_reuse=True)
+    @validator('age', allow_reuse=True,check_fields=False)
     def validate_age(cls, value:int):
         if value < 15:
             raise ValidationError('Age should be greater than 15')
@@ -53,15 +56,23 @@ class __Members_Inputs(Schema):
             if any(char in phone_pattern for char in value):
                 raise ValidationError('Invalid phone number')
             return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
-    
-    @validator('tshirt_size', allow_reuse=True)
+    @validator('ascemembership', allow_reuse=True)
+    def validate_ascemembership(cls, value: str):
+        if len(value) > 55:
+            raise ValidationError("Invalid membership")
+        if value.isalnum() == False:
+            raise ValidationError("An User Name must contain alphabetic and numeric characters.")
+        """Validar para caracteres"""
+        return value
+
+    @validator('tshirt_size', allow_reuse=True,check_fields=False)
     def validate_tshirt(cls, value: str):
         if value not in ('XS', 'S', 'M', 'L', 'XL', 'XXL'):
             raise ValidationError('Invalid tshirt size')
         else:
             return value
 
-    @validator('bachelor', allow_reuse=True)
+    @validator('bachelor', allow_reuse=True,check_fields=False)
     def validate_bachelor(cls, value: str):
         print(value)
         if any(not v.isalpha() for v in value):
@@ -69,26 +80,62 @@ class __Members_Inputs(Schema):
         else:
             return value
         
-    @validator('department', allow_reuse=True)
+    @validator('department', allow_reuse=True,check_fields=False)
     def validate_department(cls, value: str):
         if any(not v.isalpha() for v in value):
             raise ValidationError("Invalid department name")
         else:
             return value
- 
-   
+        
+    @validator('competition_name: str', allow_reuse=True,check_fields=False)
+    def validate_competition(cls, value: str):
+        if any(not v.isalpha() for v in value):
+            raise ValidationError("Invalid department name")
+        else:
+            return value
+        
+    @validator('travel_availability', allow_reuse=True)
+    def validate_travel_avail(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValidationError('Invalid tshirt size')
+        else:
+            return value
+        
+    @validator('older_than_twentyfive', allow_reuse=True)
+    def validate_older(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValidationError('Invalid tshirt size')
+        else:
+            return value
+        
+    @validator('heavy_driver', allow_reuse=True)
+    def validate_heavy_duty(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValidationError('Invalid tshirt size')
+        else:
+            return value
 
-    
-class set_SignUp_Data(__Members_Inputs):
+    @validator('official_driver', allow_reuse=True)
+    def validate_offdriver(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValidationError('Invalid tshirt size')
+        else:
+            return value
+        
+        if value not in ('Yes', 'No'):
+            raise ValidationError('Invalid tshirt size')
+        else:
+            return value
+
+class set_Competitions_Data(__Members_Inputs):
     """Setter to be used to enter signup data to database"""
-    type: str = "Member"
     created_at: datetime = datetime.now(pytz.timezone('America/Puerto_Rico'))
-    competitions_form: str = "No"
+    competitions_form: str = "Yes"
 
     class Config:
         orm_mode = True
 
-class get_SignUp_Data(Schema):
+class get_Competitions_Data(Schema):
     """Getter to be used to return signup data from database"""
     name: str
     email: EmailStr
@@ -105,9 +152,6 @@ class get_SignUp_Data(Schema):
     class Config:
             orm_mode = True
 
-# class output_Schema(Schema):
-#     status_code: Any
-#     body: Any
 
 
 class output(Schema):

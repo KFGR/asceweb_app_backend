@@ -18,3 +18,4 @@ class Chapter_Members_Table(Base):
     created_at = Column(DATETIME, nullable=False)
     competitions_form = Column(Enum('Yes','No'), nullable=False)
     aca_years = Column(Integer, nullable=False)
+
