@@ -10,7 +10,7 @@
 #     import uvicorn
 #     uvicorn.run(app, host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
 
-
+import traceback
 from fastapi import Depends, FastAPI, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
@@ -67,8 +67,7 @@ def createAdmin(userName:str, passwd:str, name:str, email:str, phone: str, admin
 def competitionSignUp(name: str, email: str, phone:str, ascemembership: str, competition_name: str, courses:str, daily_availability: str, travel_availability: str,older_than_twentyfive:str,heavy_driver:str, official_driver:str, db: Session = Depends(get_db)):
     try:
         data = Competitions_Test.put_Competition_Data(db=db,user=Competitions_Schema.set_Competitions_Data(name=name, email=email, phone=phone, ascemembership=ascemembership,competition_name=competition_name,courses=courses,daily_availability=daily_availability, travel_availability=travel_availability,older_than_twentyfive=older_than_twentyfive,heavy_driver=heavy_driver,official_driver=official_driver))
-        # return {'status_code': 300, 'body': data}, HTTP_200_OK
-        return 
+        return {'status_code': 300, 'body': data}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError) as e:
         if type(e) == ValidationError: return {'status_code':404 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == Exception: return {"status_code":404, 'body':str(e)}
@@ -81,12 +80,12 @@ def chapterSignUp(name: str, email: str, phone:str, tshirt_size: str, age: int, 
     try:
         data = SignUp_Test.put_SignUp_Data(db=db,user=SignUp_Schemas.set_SignUp_Data(name=name, email=email, phone=phone, tshirt_size=tshirt_size, age=age, bachelor=bachelor, department=department, aca_years=Academic_Years))
         return {'status_code': 200, 'body': data}
-    except (ValidationError, ValueError, Exception) as e:
-        if type(e) == ValidationError: return {'status_code':400 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
-        elif type(e) == ValueError: return {'status_code': 400,'body':str(e)}
-        elif type(e) == Exception: return {'status_code': 400,'body':str(e)}
-        elif type(e) == HTTPException: return {"status_code":400, 'body':e.detail}
-        else: return {"status_code":404, 'body':"Invalid {}".format(str(e).split()[1])}
+    except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError) as e:
+        if type(e) == ValidationError: return {'status_code':404 ,'body':json.loads(e.json())[0]['msg']}
+        elif type(e) == Exception: return {"status_code":404, 'body':str(e)}
+        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":404, 'body':str(e)}
+        elif type(e) == ValueError: return {'status_code': 409,'body':str(e)}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
 @app.get("/ascepupr/dashboard/user/table/admins/", response_model=Administrators_Schemas.Output_return)
 def getAdmins(masterAdminToken: str, db: Session = Depends(get_db)):
