@@ -67,7 +67,7 @@ def createAdmin(userName:str, passwd:str, name:str, email:str, phone: str, admin
 def competitionSignUp(name: str, email: str, asce_member:str ,ascemembership_number: str, competition_name: str, courses:str, experiences: str,daily_availability: str, travel_availability: str, travel_june:str,older_than_twentyfive:str,heavy_driver:str, official_driver:str, db: Session = Depends(get_db)):
     try:
         data = Competitions_Test.put_Competition_Data(db=db,user=Competitions_Schema.set_Competitions_Data(name=name, email=email,asce_member=asce_member, ascemembership=ascemembership_number,competition_name=competition_name,courses=courses,experiences=experiences,daily_availability=daily_availability, travel_availability=travel_availability, travel_june=travel_june,older_than_twentyfive=older_than_twentyfive,heavy_driver=heavy_driver,official_driver=official_driver))
-        return {'status_code': 300, 'body': data}
+        return {'status_code': 200, 'body': data}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError) as e:
         if type(e) == ValidationError: return {'status_code':404 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == Exception: return {"status_code":404, 'body':str(e)}
