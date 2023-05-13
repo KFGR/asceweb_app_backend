@@ -3,7 +3,7 @@ from Backend.DATABASE.Competitions_Table import Competitions_Table
 from Backend.SCHEMAS.Competitions_Schema import set_Competitions_Data
 from Backend.DATABASE.Chapter_Members_Table import Chapter_Members_Table
 from sqlalchemy import or_, exists
-
+from fastapi import HTTPException
 
 # def put_Competition_Dataa(db: Session, user: set_Competitions_Data):
 #     # db_user = db.query(Chapter_Members_Table).filter(email= user.email, phone = user.phone).first()
@@ -30,9 +30,9 @@ def ValidateExist(db:Session, user: set_Competitions_Data):
     if db_profile:
         print(type(db_profile.email), type(user.email))
         if db_profile.email == user.email:
-            raise ValueError('Email already registered')
+            raise HTTPException(status_code=422, detail='Email already exist')
         if db_profile.ascemembership == user.ascemembership:
-            raise  ValueError('ASCE membership already registered')
+            raise  HTTPException(status_code=422, detail='ASCE membership already exist')
     else:
         return False
     
@@ -53,5 +53,5 @@ def put_Competition_Data(db:Session, user:set_Competitions_Data):
             db.commit()
             db.refresh(member_exist)
             return "Congrats {} you are now in list to participate for a competition.".format(user.name)
-        raise Exception('No membership account was found')
-    raise Exception('Already in a list for a competition')
+        raise HTTPException(status_code=404, detail="No username found")
+    raise HTTPException(status_code=409, detail="Already in list of competition")

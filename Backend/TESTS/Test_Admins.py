@@ -112,8 +112,8 @@ def get_Competitions_Table(db: Session, admin: adminSchema.Administrator_MasterA
         admins = db.query(Competitions_Table).all()
         if admins:
             return [adminSchema.get_Competitions_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,asce_member=entry.asce_member,ascemembership=entry.ascemembership, competition_name=entry.competition_name,courses=entry.courses, daily_availability=entry.daily_avail, experiences=entry.experiences, travel_availability=entry.travel_avail, travel_june=entry.travel_june, older_than_twentyfive=entry.age_gt_twtfive,heavy_driver=entry.hv_vehicle,official_driver=entry.offdriver_avail,competitions_form=entry.competitions_form,created_at=entry.created_at) for entry in admins]
-        raise Exception("No data was found")
-    raise Exception("Invalid Administrator")
+        raise HTTPException(status_code=404, detail="No data was found")
+    raise HTTPException(status_code=401, detail="Invalid Administrator")
 
 
 
@@ -239,7 +239,16 @@ def updateCompetitionsMembers(db: Session, user=adminSchema.Member_upate_table):
         else:raise HTTPException(status_code=401, detail="Invalid Administrator")
     raise Exception("Something went wrong") #goes directly to internal server error exception
 
-
+"""
+email
+phone
+tshirt_size
+age
+bachelor
+department
+aca_years
+membership_paid
+"""
 def updateMembers(db: Session, user=adminSchema.Member_upate_table):
     """Email, phone and id are unique"""
     if not ValidateExist(db=db,table="UpdateCompetitionsSignUp", user=user):
@@ -255,10 +264,10 @@ def updateMembers(db: Session, user=adminSchema.Member_upate_table):
                         user_row.email = user.newEmail
                     else: raise HTTPException(status_code=409, detail="This user is already using this email")
 
-                if user.newPasswd is not None:
-                    if not __sc.validateHash(user.newPasswd.get_secret_value(),user_row.password):
-                        user_row.password = __sc.encryptHash(user.newPasswd.get_secret_value())
-                    else: raise HTTPException(status_code=409, detail="Cannot use the same password")
+                if user.newTshirt_size is not None:
+                    if user.newTshirt_size != user_row.tshirt_size:
+                        user_row.tshirt_size = user.newTshirt_size
+                    else: pass
 
                 if user.newPhone is not None:
                     if user.newPhone != user_row.phone:

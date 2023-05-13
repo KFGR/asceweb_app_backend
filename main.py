@@ -67,13 +67,12 @@ def createAdmin(userName:str, passwd:str, name:str, email:str, phone: str, admin
 def competitionSignUp(name: str, email: str, asce_member:str ,ascemembership_number: str, competition_name: str, courses:str, experiences: str,daily_availability: str, travel_availability: str, travel_june:str,older_than_twentyfive:str,heavy_driver:str, official_driver:str, db: Session = Depends(get_db)):
     try:
         data = Competitions_Test.put_Competition_Data(db=db,user=Competitions_Schema.set_Competitions_Data(name=name, email=email,asce_member=asce_member, ascemembership=ascemembership_number,competition_name=competition_name,courses=courses,experiences=experiences,daily_availability=daily_availability, travel_availability=travel_availability, travel_june=travel_june,older_than_twentyfive=older_than_twentyfive,heavy_driver=heavy_driver,official_driver=official_driver))
-        return {'status_code': 200, 'body': data}
-    except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError) as e:
-        if type(e) == ValidationError: return {'status_code':404 ,'body':json.loads(e.json())[0]['msg']}
-        elif type(e) == Exception: return {"status_code":404, 'body':str(e)}
+        return {"status_code":HTTP_201_CREATED, 'body':"User updated"}
+    except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
+        if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":404, 'body':str(e)}
-        elif type(e) == ValueError: return {'status_code': 409,'body':str(e)}
-        else: return {"status_code":500, 'body':"Invalid Server Error"}
+        elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
 @app.post("/ascewepupr/signup/form/signuptochapter/",response_model=Administrators_Schemas.Output_return)
 def chapterSignUp(name: str, email: str, phone:str, tshirt_size: str, age: int, bachelor:str, department: str, Academic_Years: int, db: Session = Depends(get_db)):
@@ -111,10 +110,10 @@ def getMembers(masterAdminToken: str, db: Session = Depends(get_db)):
 def getCompetitionsMembers(masterAdminToken: str, db: Session = Depends(get_db)):
     try:
         data = ta.get_Competitions_Table(db=db, admin=Administrators_Schemas.Administrator_MasterAdminToken(masterAdminToken=masterAdminToken))
-        return {"status_code":200, "body": data}
-    except (Exception,DecodeError,InvalidSignatureError) as e:
-        if type(e) == Exception: return {"status_code":404, 'body':str(e)}
-        if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":404, 'body':str(e)}
+        return {'status_code':HTTP_200_OK, 'body':data}
+    except (HTTPException,DecodeError,InvalidSignatureError) as e:
+        if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         return {"status_code":500, 'body':"Invalid Server Error"}
 
 @app.put("/ascepupr/dashboard/admin/table/update/admin/updatefromadmin/", response_model=Administrators_Schemas.Output_return)
