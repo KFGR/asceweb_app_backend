@@ -97,22 +97,26 @@ def getAdmins(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
 
 def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
-    if admin_user and (__sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA"):
-        members = db.query(Chapter_Members_Table).all()
-        if members:
-            return [adminSchema.get_SignUp_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,tshirt_size=entry.tshirt_size,age=entry.age,bachelor=entry.bachelor,department=entry.department,type=entry.type,created_at=entry.created_at,competitions_form=entry.competitions_form,aca_years=entry.aca_years,membership_paid=entry.membership_paid,membership_until=entry.membership_until) for entry in members]
-        raise HTTPException(status_code=404, detail="No data was found")
-    raise HTTPException(status_code=401, detail="Invalid Administrator")
+    if admin_user:
+        if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA":
+            members = db.query(Chapter_Members_Table).all()
+            if members:
+                return [adminSchema.get_SignUp_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,tshirt_size=entry.tshirt_size,age=entry.age,bachelor=entry.bachelor,department=entry.department,type=entry.type,created_at=entry.created_at,competitions_form=entry.competitions_form,aca_years=entry.aca_years,membership_paid=entry.membership_paid,membership_until=entry.membership_until) for entry in members]
+            raise HTTPException(status_code=400, detail="No data was found")
+        raise HTTPException(status_code=401, detail="Invalid Administrator")
+    raise HTTPException(status_code=404, detail="No user found")
 
 def get_Competitions_Table(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     """Function that returns the whole table of admins users"""
     admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
-    if admin_user and (__sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA"):
-        admins = db.query(Competitions_Table).all()
-        if admins:
-            return [adminSchema.get_Competitions_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,asce_member=entry.asce_member,ascemembership=entry.ascemembership, competition_name=entry.competition_name,courses=entry.courses, daily_availability=entry.daily_avail, experiences=entry.experiences, travel_availability=entry.travel_avail, travel_june=entry.travel_june, older_than_twentyfive=entry.age_gt_twtfive,heavy_driver=entry.hv_vehicle,official_driver=entry.offdriver_avail,competitions_form=entry.competitions_form,created_at=entry.created_at) for entry in admins]
-        raise HTTPException(status_code=404, detail="No data was found")
-    raise HTTPException(status_code=401, detail="Invalid Administrator")
+    if admin_user:
+        if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA":
+            admins = db.query(Competitions_Table).all()
+            if admins:
+                return [adminSchema.get_Competitions_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,asce_member=entry.asce_member,ascemembership=entry.ascemembership, competition_name=entry.competition_name,courses=entry.courses, daily_availability=entry.daily_avail, experiences=entry.experiences, travel_availability=entry.travel_avail, travel_june=entry.travel_june, older_than_twentyfive=entry.age_gt_twtfive,heavy_driver=entry.hv_vehicle,official_driver=entry.offdriver_avail,competitions_form=entry.competitions_form,created_at=entry.created_at) for entry in admins]
+            raise HTTPException(status_code=400, detail="No data was found")
+        raise HTTPException(status_code=401, detail="Invalid Administrator")
+    raise HTTPException(status_code=404, detail="No user found")
 
 
 

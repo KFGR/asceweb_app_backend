@@ -98,10 +98,10 @@ def getAdmins(masterAdminToken: str, db: Session = Depends(get_db)):
 def getMembers(masterAdminToken: str, db: Session = Depends(get_db)):
     try:
         data = ta.get_SignUp_Table(db=db, admin=Administrators_Schemas.Administrator_MasterAdminToken(masterAdminToken=masterAdminToken))
-        return {"status_code":200, "body": data}
-    except (Exception,DecodeError,InvalidSignatureError) as e:
-        if type(e) == Exception: return {"status_code":404, 'body':str(e)}
-        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":404, 'body':str(e)}
+        return {'status_code':HTTP_200_OK, 'body':data}
+    except (HTTPException,DecodeError,InvalidSignatureError) as e:
+        if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         return {"status_code":500, 'body':"Invalid Server Error"}
 
 @app.get("/ascepupr/dashboard/user/table/competitions/", response_model=Administrators_Schemas.Output_return)
