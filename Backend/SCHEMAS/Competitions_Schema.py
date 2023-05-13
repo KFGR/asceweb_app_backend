@@ -1,6 +1,6 @@
 from pydantic import BaseModel as Schema, validator, root_validator, EmailStr, SecretStr
 from datetime import datetime
-import pytz
+import pytz, re
 from typing import Any
 
 
@@ -8,7 +8,7 @@ class __Members_Inputs(Schema):
     """Private class to validate all inputs from the signup form"""
     name: str
     email: str
-    phone: str
+    phone: str = None
     ascemembership: str
     competition_name: str
     courses: str
@@ -17,6 +17,9 @@ class __Members_Inputs(Schema):
     older_than_twentyfive: str
     heavy_driver: str
     official_driver: str
+    travel_june: str
+    experiences: str
+    asce_member: str
 
     @validator('*', allow_reuse=True, pre=True)
     def isEmpty(cls, value: str | datetime):
@@ -39,26 +42,18 @@ class __Members_Inputs(Schema):
 
     @validator('email', allow_reuse=True)
     def validate_email(cls, value: str):
-        if " " in value:
-            raise ValueError("No spaces allowed on email")
-        if value.lower() != value:
-            raise ValueError("The email must be in lower - case.")
-        email_domain = value.split('@')[1]
-        if email_domain != 'students.pupr.edu':
-            raise ValueError("Invalid email")
+        if value:
+            if " " in value:
+                raise ValueError("No spaces allowed on email")
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+                raise ValueError("Invalid email")
+            if value.lower() != value:
+                raise ValueError("The email must be in lower - case.")
+            email_domain = value.split('@')[1]
+            if email_domain != 'students.pupr.edu':
+                raise ValueError("Invalid email")
+            return value
         return value
-    
-    @validator('phone', allow_reuse=True)
-    def validate_phone(cls, value: str):
-        if " " in value:
-            raise ValueError("No spaces allowed on phone")
-        if len(value) > 10 or len(value) < 10:
-            raise ValueError('Not a phone number')
-        else:
-            phone_pattern = set('!@#$%^&*()_+-=`~<>,.?/:;"{}[]\'')
-            if any(char in phone_pattern for char in value):
-                raise ValueError('Invalid phone number')
-            return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
         
     @validator('ascemembership', allow_reuse=True)
     def validate_ascemembership(cls, value: str):
@@ -70,15 +65,6 @@ class __Members_Inputs(Schema):
             raise ValueError("An User Name must contain alphabetic and numeric characters.")
         """Validar para caracteres"""
         return value
-
-    # @validator('bachelor', allow_reuse=True,check_fields=False)
-    # def validate_bachelor(cls, value: str):
-    #     if value[0].isspace() or value[-1].isspace():
-    #         raise ValueError("No spaces allowed on bachelor")
-    #     if any(not v.isalpha() for v in value):
-    #         raise ValueError("Invalid bachelors name")
-    #     else:
-    #         return value
         
     # @validator('department', allow_reuse=True,check_fields=False)
     # def validate_department(cls, value: str):
@@ -98,6 +84,23 @@ class __Members_Inputs(Schema):
         else:
             return value
         
+    @validator('experiences: str', allow_reuse=True,check_fields=False)
+    def validate_exp(cls, value: str):
+        if value[0].isspace():
+            raise ValueError("No spaces allowed on experiences")
+        return value
+    
+    @validator('courses: str', allow_reuse=True,check_fields=False)
+    def validate_courses(cls, value: str):
+        if value[0].isspace():
+            raise ValueError("No spaces allowed on courses")
+        return value
+    @validator('daily_availability: str', allow_reuse=True,check_fields=False)
+    def validate_dailyavailability(cls, value: str):
+        if value[0].isspace():
+            raise ValueError("No spaces allowed on daily availability")
+        return value
+        
     # @validator('travel_availability', allow_reuse=True)
     # def validate_travel_avail(cls, value: str):
     #     if value != 'Yes' or value != 'No':
@@ -116,7 +119,28 @@ class __Members_Inputs(Schema):
             raise ValueError('Invalid answer')
         else:
             return value
+        
+    @validator('travel_june', allow_reuse=True)
+    def validate_travel_june(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValueError('Invalid answer')
+        else:
+            return value
+        
+    @validator('asce_member', allow_reuse=True)
+    def validate_asce_member(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValueError('Invalid answer')
+        else:
+            return value
 
+    @validator('asce_member', allow_reuse=True)
+    def validate_ascemember(cls, value: str):
+        if value not in ('Yes', 'No'):
+            raise ValueError('Invalid answer')
+        else:
+            return value
+        
     @validator('official_driver', allow_reuse=True)
     def validate_offdriver(cls, value: str):
         if value not in ('Yes', 'No'):
@@ -145,6 +169,9 @@ class get_Competitions_Data(Schema):
     created_at: datetime
     competitions_form: str
     aca_years: int
+    travel_june: str
+    experiences: str
+    asce_member: str
 
     class Config:
             orm_mode = True

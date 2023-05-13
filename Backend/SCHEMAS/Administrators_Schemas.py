@@ -1,7 +1,7 @@
 from pydantic import BaseModel as Schema,validator, root_validator, EmailStr, SecretStr
 import datetime as dt
 from typing import Any
-
+import re 
 
 '''
     ----------------------------------------------------------------
@@ -103,8 +103,7 @@ class Administrator_CreateAccount_INPUTS(__Administrator_Basic_INPUTS):    #   A
 
     @validator('adminLevel',allow_reuse=True)
     def isAdminLevel(cls, value: str):
-
-        if (len(value) <= 0 or len(value) > 2):
+        if len(value) != 2:
             raise ValueError("Invalid Admin levels")
         if not(value == "MA" or value == "GA"):
             raise ValueError("Invalid Admin levels")
@@ -147,59 +146,83 @@ class Administrator_LoginAccount_INPUTS(__Administrator_Basic_INPUTS):
 class Administrator_ChangePasswdEmail_INPUTS(Schema):
     userName: str
     newPasswd: SecretStr = None
-    newEmail: EmailStr = None
+    newEmail: str = None
     newPhone: str = None
     newLevel: str = None
     updatedAt: dt.datetime = dt.datetime.now()
 
     masterAdminToken: str
     
-    @validator('userName', allow_reuse=True)
-    def isUserName(cls, value: str):
-        if len(value) < 5:
-            raise ValueError("The User Name must have more than four (4) characters.")
-        if value.isalnum() == False:
-            raise ValueError("An User Name must contain alphabetic and numeric characters.")
-        if value.islower() or value.isupper():
-            raise ValueError("A User Name must have both upper - case and lower - case characters.")
-        return value
-    
     @validator('newPasswd', allow_reuse=True)
     def isPasswd(cls, value: SecretStr):
         if value != None:
+            if " " in value.get_secret_value():
+                raise ValueError("Password must not contain spaces.")
             if len(value) < 8:
-                raise ValueError("The New Password must have at least eight (8) characters.")
-            if value.get_secret_value().islower() or value.get_secret_value().isupper():
-                raise ValueError("A New Password must have both upper - case and lower - case characters.")
-            if all(v.isalnum() or v in ('!', '@', '#', '$', '%', '&') for v in value.get_secret_value()) == False:
-                raise ValueError("A New Password must have numbers, letters and symbols.")
+                raise ValueError("Password must have at least eight (8) characters.")
+            if not any(char.isupper() for char in value.get_secret_value()):
+                raise ValueError("Password must contain at least one uppercase letter.")
+            if not any(char.islower() for char in value.get_secret_value()):
+                raise ValueError("Password must contain at least one lowercase letter.")
+            if not any(char.isdigit() for char in value.get_secret_value()):
+                raise ValueError("Password must contain at least one number.")
+            if not any(char in ('!', '@', '#', '$', '%', '&') for char in value.get_secret_value()):
+                raise ValueError("Password must contain at least one special character.")
         return value
     
     @validator('newPhone', allow_reuse=True)
     def validate_phone(cls, value: str):
-        if value != None:
-            if len(value) > 10 or len(value) < 10:
+        if value:
+            if len(value) != 10:
                 raise ValueError('Invalid Phone number')
             else:
-                phone_pattern = set('!@#$%^&*()_+-=`~<>,.?/:;"{}[]\'')
-                if any(char in phone_pattern for char in value):
+                if not value.isdigit():
                     raise ValueError('Invalid Phone number')
                 return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
         return value
+    
+    @validator('newLevel',allow_reuse=True)
+    def isAdminLevel(cls, value: str):
+        if value:
+            if len(value) != 2:
+                raise ValueError("Invalid Admin levels")
+            if not value in ('MA', 'GA'):
+                raise ValueError("Invalid Admin levels")
+            return value
+        return value
+    
+
+    @validator('newEmail', allow_reuse=True)
+    def validate_email(cls, value: str):
+        if value:
+            if " " in value:
+                raise ValueError("No spaces allowed on email")
+            if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+                raise ValueError("Invalid email")
+            if value.lower() != value:
+                raise ValueError("The email must be in lower - case.")
+            email_domain = value.split('@')[1]
+            if email_domain.count('.com') > 1:
+                raise ValueError("Invalid email")
+            return value
+        return value
+
     class Config:
         orm_mode = True
 
 
 
 class Member_upate_table(Schema):
-    name: str 
-    email: EmailStr = None
-    phone: str = None
-    tshirt_size: str = None
-    age: int = None
-    bachelor: str = None
-    department: str = None
-    aca_years: int = None
+    email: str
+    newEmail: str
+    newPhone: str
+    newTshirt_size: str
+    newAge: int
+    newBachelor: str
+    newDepartment: str
+    newAca_years: int
+    newMembership: str
+
     masterAdminToken: str
 
     @validator('*', allow_reuse=True, pre=True)
@@ -208,20 +231,12 @@ class Member_upate_table(Schema):
             raise ValueError("None of the Fields can be empty!")
         return value
     
-    @validator('name', allow_reuse=True)
-    def isName(cls, value: str):
-     if len(value.split()) != 2:
-         raise ValueError("Invalid Name")
-     if value[0].isspace() or value[-1].isspace():
-         raise ValueError("No spaces allowed at the beginning or end of name")
-     if any(v[0].islower() for v in value.split()):
-         raise ValueError("Uppercase letter must be in name")
-     if any(not v.isalpha() and not v.isspace() for v in value):
-         raise ValueError("A name only contains letters.")
-     return value
-    
     @validator('email', allow_reuse=True)
-    def validate_email(cls, value: EmailStr):
+    def validate_email(cls, value: str):
+        if " " in value:
+            raise ValueError("No spaces allowed at the beginning or end of email")
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+                raise ValueError("Invalid email")
         if value.lower() != value:
             raise ValueError("The email must be in lower - case.")
         email_domain = value.split('@')[1]
@@ -229,7 +244,29 @@ class Member_upate_table(Schema):
             raise ValueError("Invalid email")
         return value
     
-    @validator('age', allow_reuse=True)
+    @validator('newEmail', allow_reuse=True)
+    def validate_email(cls, value: str):
+        if " " in value:
+            raise ValueError("No spaces allowed at the beginning or end of email")
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+                raise ValueError("Invalid email")
+        if value.lower() != value:
+            raise ValueError("The email must be in lower - case.")
+        email_domain = value.split('@')[1]
+        if email_domain not in ('pupr.edu', 'students.pupr.edu'):
+            raise ValueError("Invalid email")
+        return value
+    
+    @validator('newPhone', allow_reuse=True)
+    def validate_phone(cls, value: str):
+        if len(value) != 10:
+            raise ValueError('Invalid Phone number')
+        else:
+            if not value.isdigit():
+                raise ValueError('Invalid Phone number')
+            return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
+
+    @validator('newAge', allow_reuse=True)
     def validate_age(cls, value:int):
         if value < 15:
             raise ValueError('Age should be greater than 15')
@@ -237,51 +274,52 @@ class Member_upate_table(Schema):
             raise ValueError('Age should be less than 150')
         return value
     
-    @validator('phone', allow_reuse=True)
-    def validate_phone(cls, value: str):
-        if len(value) > 10 or len(value) < 10:
-            raise ValueError('Not a phone number')
-        else:
-            phone_pattern = set('!@#$%^&*()_+-=`~<>,.?/:;"{}[]\'')
-            if any(char in phone_pattern for char in value):
-                raise ValueError('Invalid phone number')
-            return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
-    
-    @validator('tshirt_size', allow_reuse=True)
+    @validator('newTshirt_size', allow_reuse=True)
     def validate_tshirt(cls, value: str):
         if value not in ('XS', 'S', 'M', 'L', 'XL', 'XXL'):
             raise ValueError('Invalid tshirt size')
         else:
             return value
 
-    @validator('bachelor', allow_reuse=True)
+    @validator('newBachelor', allow_reuse=True,check_fields=False)
     def validate_bachelor(cls, value: str):
-        print(value)
-        if any(not v.isalpha() for v in value):
-            raise ValueError("Invalid bachelors name")
-        else:
-            return value
+        if value[0].isspace() or value[-1].isspace():
+            raise ValueError("No spaces allowed at the beginning or end of bachelor")
+        if any(not v.isalpha() and not v.isspace() for v in value):
+         raise ValueError("A bachelor only contains letters.")
         
-    @validator('department', allow_reuse=True)
+        return value
+        
+    @validator('newDepartment', allow_reuse=True,check_fields=False)
     def validate_department(cls, value: str):
-        if any(not v.isalpha() for v in value):
-            raise ValueError("Invalid department name")
-        else:
-            return value
+        if value[0].isspace() or value[-1].isspace():
+            raise ValueError("No spaces allowed at the beginning or end of department")
+        if any(not v.isalpha() and not v.isspace() for v in value):
+         raise ValueError("A department only contains letters.")
+        
+        return value
+   
+    @validator('newMembership',allow_reuse=True)
+    def validate_membership(cls,value:str):
+        if " " in value:
+            raise ValueError("Space is not allowed in membership input")
+        if value not in ('Yes','No'):
+            raise ValueError("Invalid membership input")
     class Config:
         orm_mode = True
 
 class Competitions_upate_table(Schema):
-    email: str = None
-    phone: str = None
-    ascemembership: str = None
-    competition_name: str = None
-    courses: str = None
-    travel_availability: str = None
-    older_than_twentyfive: str = None
-    heavy_driver: str = None
-    official_driver: str = None
-    competitions_form: str = None
+    email: str
+    newEmail: str = None
+    newPhone: str = None
+    newCompetition_name: str = None
+    newCourses: str = None
+    newTravel_availability: str = None
+    newOlder_than_twentyfive: str = None
+    newHeavy_driver: str = None
+    newOfficial_driver: str = None
+    travel_june: str = None
+    experiences: str = None
 
     @validator('*', allow_reuse=True, pre=True)
     def isEmpty(cls, value: str | dt.datetime):
@@ -289,7 +327,7 @@ class Competitions_upate_table(Schema):
             raise ValueError("None of the Fields can be empty!")
         return value
 
-    @validator('email', allow_reuse=True)
+    @validator('newEmail', allow_reuse=True)
     def validate_email(cls, value: str):
         if " " in value:
             raise ValueError("No spaces allowed on email")
@@ -300,7 +338,7 @@ class Competitions_upate_table(Schema):
             raise ValueError("Invalid email")
         return value
     
-    @validator('phone', allow_reuse=True)
+    @validator('newPhone', allow_reuse=True)
     def validate_phone(cls, value: str):
         if " " in value:
             raise ValueError("No spaces allowed on phone")
@@ -312,18 +350,8 @@ class Competitions_upate_table(Schema):
                 raise ValueError('Invalid phone number')
             return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
         
-    @validator('ascemembership', allow_reuse=True)
-    def validate_ascemembership(cls, value: str):
-        if " " in value:
-            raise ValueError("No spaces allowed on ascemembership number")
-        if len(value) > 55:
-            raise ValueError("Invalid membership")
-        if value.isalnum() == False:
-            raise ValueError("An User Name must contain alphabetic and numeric characters.")
-        """Validar para caracteres"""
-        return value
     
-    @validator('competition_name: str', allow_reuse=True,check_fields=False)
+    @validator('newCompetition_name: str', allow_reuse=True,check_fields=False)
     def validate_competition(cls, value: str):
         if value[0].isspace() or value[-1].isspace():
             raise ValueError("No spaces allowed on competitions name")
@@ -332,14 +360,14 @@ class Competitions_upate_table(Schema):
         else:
             return value
         
-    @validator('heavy_driver', allow_reuse=True)
+    @validator('newHeavy_driver', allow_reuse=True)
     def validate_heavy_duty(cls, value: str):
         if value not in ('Yes', 'No'):
             raise ValueError('Invalid answer')
         else:
             return value
 
-    @validator('official_driver', allow_reuse=True)
+    @validator('newOfficial_driver', allow_reuse=True)
     def validate_offdriver(cls, value: str):
         if value not in ('Yes', 'No'):
             raise ValueError('Invalid answer')
@@ -507,6 +535,9 @@ class get_Competitions_Data(Schema):
     official_driver: str
     created_at: dt.datetime
     competitions_form: str 
+    travel_june: str
+    experiences: str
+    asce_member: str
 
     class Config:
             orm_mode = True

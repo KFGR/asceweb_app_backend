@@ -1,6 +1,6 @@
-from pydantic import BaseModel as Schema, ValidationError, validator, root_validator, EmailStr, SecretStr
+from pydantic import BaseModel as Schema, validator, root_validator, EmailStr, SecretStr
 from datetime import datetime
-import pytz
+import pytz, re
 from typing import Any
 
 
@@ -28,7 +28,7 @@ class __Members_Inputs(Schema):
      if value[0].isspace() or value[-1].isspace():
          raise ValueError("No spaces allowed at the beginning or end of name")
      if any(v[0].islower() for v in value.split()):
-         raise ValueError("All parts of any name should contain upper - case characters.")
+         raise ValueError("Capital letter at the beginning of firstname and lastname")
      if any(not v.isalpha() and not v.isspace() for v in value):
          raise ValueError("A name only contains letters.")
      return value
@@ -36,58 +36,58 @@ class __Members_Inputs(Schema):
     @validator('email', allow_reuse=True)
     def validate_email(cls, value: str):
         if " " in value:
-            raise ValueError("No spaces allowed on email")
+            raise ValueError("No spaces allowed at the beginning or end of email")
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", value):
+                raise ValueError("Invalid email")
         if value.lower() != value:
             raise ValueError("The email must be in lower - case.")
         email_domain = value.split('@')[1]
-        if email_domain != 'students.pupr.edu':
+        if email_domain not in ('pupr.edu', 'students.pupr.edu'):
             raise ValueError("Invalid email")
         return value
     
     @validator('phone', allow_reuse=True)
     def validate_phone(cls, value: str):
-        if " " in value:
-            raise ValueError("No spaces allowed on phone")
-        if len(value) > 10 or len(value) < 10:
-            raise ValueError('Not a phone number')
+        if len(value) != 10:
+            raise ValueError('Invalid Phone number')
         else:
-            phone_pattern = set('!@#$%^&*()_+-=`~<>,.?/:;"{}[]\'')
-            if any(char in phone_pattern for char in value):
-                raise ValueError('Invalid phone number')
+            if not value.isdigit():
+                raise ValueError('Invalid Phone number')
             return "{}-{}-{}".format(value[:3],value[3:6],value[6:])
+
     
     @validator('age', allow_reuse=True)
     def validate_age(cls, value:int):
         if value < 15:
-            raise ValidationError('Age should be greater than 15')
+            raise ValueError('Age should be greater than 15')
         elif value > 150:
-            raise ValidationError('Age should be less than 150')
+            raise ValueError('Age should be less than 150')
         return value
     
     @validator('tshirt_size', allow_reuse=True)
     def validate_tshirt(cls, value: str):
         if value not in ('XS', 'S', 'M', 'L', 'XL', 'XXL'):
-            raise ValidationError('Invalid tshirt size')
+            raise ValueError('Invalid tshirt size')
         else:
             return value
 
     @validator('bachelor', allow_reuse=True,check_fields=False)
     def validate_bachelor(cls, value: str):
         if value[0].isspace() or value[-1].isspace():
-            raise ValueError("No spaces allowed on bachelor")
-        if any(not v.isalpha() for v in value):
-            raise ValueError("Invalid bachelors name")
-        else:
-            return value
+            raise ValueError("No spaces allowed at the beginning or end of bachelor")
+        if any(not v.isalpha() and not v.isspace() for v in value):
+         raise ValueError("A bachelor only contains letters.")
+        
+        return value
         
     @validator('department', allow_reuse=True,check_fields=False)
     def validate_department(cls, value: str):
         if value[0].isspace() or value[-1].isspace():
-            raise ValueError("No spaces allowed on department")
-        if any(not v.isalpha() for v in value):
-            raise ValueError("Invalid department name")
-        else:
-            return value
+            raise ValueError("No spaces allowed at the beginning or end of department")
+        if any(not v.isalpha() and not v.isspace() for v in value):
+         raise ValueError("A department only contains letters.")
+        
+        return value
  
     
 class set_SignUp_Data(__Members_Inputs):
