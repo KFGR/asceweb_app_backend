@@ -24,5 +24,4 @@ def put_SignUp_Data(db: Session, user: set_SignUp_Data):
         db.commit()
         db.refresh(db_members)
         return "Congrats {} you are now a member of the ASCE-PUPR student chapter".format(user.name)
-        raise HTTPException(status_code=404, detail="No username found")
     raise HTTPException(status_code=409, detail="Already in list of competition")

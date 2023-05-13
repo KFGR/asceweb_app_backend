@@ -57,13 +57,15 @@ def createAdmin(db:Session, admin: adminSchema.Administrator_CreateAccount_DB):
     """Function used to create admin users, by first validating that the username, phone and email does not exist"""
     if not ValidateExist(db, table="CreateAdmin", user=admin):
         admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
-        if admin_user and __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user.admin_level == 'MA':
-            dbAdmin = Administrators_Table(name=admin.name, email=admin.email,phone=admin.phone, username=admin.userName, password=__sc.encryptHash(admin.passwd.get_secret_value()), admin_level=admin.adminLevel,created_at=admin.createdAt, updated_at=admin.updatedAt)
-            db.add(dbAdmin)
-            db.commit()
-            db.refresh(dbAdmin)
-        raise Exception('Invalid Administrator')
-    raise Exception('Username, email or phone already exist')
+        if admin_user:
+            if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user.admin_level == 'MA':
+                dbAdmin = Administrators_Table(name=admin.name, email=admin.email,phone=admin.phone, username=admin.userName, password=__sc.encryptHash(admin.passwd.get_secret_value()), admin_level=admin.adminLevel,created_at=admin.createdAt, updated_at=admin.updatedAt)
+                db.add(dbAdmin)
+                db.commit()
+                db.refresh(dbAdmin)
+            raise HTTPException(status_code=401, detail="Invalid Administrator")
+        raise HTTPException(status_code=404, detail="No username found")
+    raise HTTPException(status_code=409, detail="User already in table")
 
 
 def loginAdmin(db: Session, admin: adminSchema.Administrator_LoginAccount_DB) -> list:
