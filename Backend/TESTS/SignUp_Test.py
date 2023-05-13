@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from Backend.DATABASE.Chapter_Members_Table import Chapter_Members_Table
 from Backend.SCHEMAS.SignUp_Schemas import set_SignUp_Data
 from sqlalchemy import or_
+from fastapi import HTTPException
 
 
 def ValidateExist(db:Session, user: set_SignUp_Data):
@@ -10,9 +11,9 @@ def ValidateExist(db:Session, user: set_SignUp_Data):
     if db_profile:
         print(type(db_profile.email), type(user.email))
         if db_profile.email == user.email:
-            raise ValueError('Email already registered')
+            raise HTTPException(status_code=422, detail='Email already exist')
         if db_profile.phone == user.phone:
-            raise  ValueError('Phone already registered')
+            raise  HTTPException(status_code=422, detail='Phone already exist')
     else:
         return False
 
@@ -22,5 +23,6 @@ def put_SignUp_Data(db: Session, user: set_SignUp_Data):
         db.add(db_members)
         db.commit()
         db.refresh(db_members)
-        return 'Congrats {} you are now part of the ASCE PUPR Student Chapter'.format(user.name)
-    raise Exception("Already registered in a the student chapter")
+        return "Congrats {} you are now a member of the ASCE-PUPR student chapter".format(user.name)
+        raise HTTPException(status_code=404, detail="No username found")
+    raise HTTPException(status_code=409, detail="Already in list of competition")

@@ -62,7 +62,6 @@ def createAdmin(db:Session, admin: adminSchema.Administrator_CreateAccount_DB):
             db.add(dbAdmin)
             db.commit()
             db.refresh(dbAdmin)
-            return True
         raise Exception('Invalid Administrator')
     raise Exception('Username, email or phone already exist')
 
@@ -102,8 +101,8 @@ def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminTo
         members = db.query(Chapter_Members_Table).all()
         if members:
             return [adminSchema.get_SignUp_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,tshirt_size=entry.tshirt_size,age=entry.age,bachelor=entry.bachelor,department=entry.department,type=entry.type,created_at=entry.created_at,competitions_form=entry.competitions_form,aca_years=entry.aca_years,membership_paid=entry.membership_paid,membership_until=entry.membership_until) for entry in members]
-        raise Exception("No data was found")
-    raise Exception("Invalid Administrator")
+        raise HTTPException(status_code=404, detail="No data was found")
+    raise HTTPException(status_code=401, detail="Invalid Administrator")
 
 def get_Competitions_Table(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     """Function that returns the whole table of admins users"""
