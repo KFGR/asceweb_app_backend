@@ -53,11 +53,14 @@ class Secuirity:
             'exp_date': self.__getTimeNow().timestamp(),
             'level': data['admin_level']
         }
-        #print(self.__SECRET_ENV_KEY)
         return jwt.encode(token_payload,self.__SECRET_ENV_KEY, algorithm="HS256")
 
     def decodeToken(self,token: str):
-        return jwt.decode(token, self.__SECRET_ENV_KEY, algorithms="HS256")
+        """This function accepts a token and tries to decoded, if the token is invalid the exception is caught"""
+        try:
+            return jwt.decode(token, self.__SECRET_ENV_KEY, algorithms="HS256")
+        except jwt.exceptions.PyJWTError as e:
+            raise type(e)("Invalid Token") from e
 
     
     def validateToken(self,username:str, role:str, token:str):
