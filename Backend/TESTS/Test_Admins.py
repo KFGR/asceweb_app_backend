@@ -63,6 +63,7 @@ def createAdmin(db:Session, admin: adminSchema.Administrator_CreateAccount_DB):
                 db.add(dbAdmin)
                 db.commit()
                 db.refresh(dbAdmin)
+                return "Administrator created"
             raise HTTPException(status_code=401, detail="Invalid Administrator")
         raise HTTPException(status_code=404, detail="No username found")
     raise HTTPException(status_code=409, detail="User already in table")

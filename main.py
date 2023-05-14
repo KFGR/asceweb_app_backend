@@ -54,8 +54,8 @@ def createAdmin(userName:str, passwd:str, name:str, email:str, phone: str, admin
         Testing purposes or failsafe
     '''
     try:
-        ta.createAdmin(db=db, admin=Administrators_Schemas.Administrator_CreateAccount_INPUTS(userName=userName, passwd=passwd,name=name,email=email,adminLevel=adminLevel, masterAdminToken=token, phone=phone))
-        return{"status_code":HTTP_201_CREATED, 'body': 'User created'}
+        data = ta.createAdmin(db=db, admin=Administrators_Schemas.Administrator_CreateAccount_INPUTS(userName=userName, passwd=passwd,name=name,email=email,adminLevel=adminLevel, masterAdminToken=token, phone=phone))
+        return{"status_code":HTTP_201_CREATED, 'body': data}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":404, 'body':str(e)}
