@@ -87,13 +87,23 @@ def getAdmins(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     """Function that returns the whole table of admins users"""
     admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
     if admin_user:
-        if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA" or  admin_user[1] == "GA":
-            admins = db.query(Administrators_Table).all()
-            if admins:
-                return [adminSchema.Administrator_GETTER(idAdministrators=entry.idadministrators,name=entry.name,userName=entry.username,password=entry.password,email=entry.email, phone=entry.phone,adminLevel=entry.admin_level, createdAt=entry.created_at, updatedAt=entry.updated_at) for entry in admins]
-            raise HTTPException(status_code=400, detail="No data was found")
+        if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True]:
+            if admin_user[1] == "MA":
+                admins = db.query(Administrators_Table).all()
+                if admins:
+                    return [adminSchema.Administrator_GETTER(idAdministrators=entry.idadministrators,name=entry.name,userName=entry.username,password=entry.password,email=entry.email, phone=entry.phone,adminLevel=entry.admin_level, createdAt=entry.created_at, updatedAt=entry.updated_at) for entry in admins]
+                raise HTTPException(status_code=400, detail="No data was found")
+            
+            elif admin_user[1] == "GA":
+                admins = db.query(Administrators_Table).all()
+                if admins:
+                    return [adminSchema.Administrator_GETTER(idAdministrators=entry.idadministrators,name=entry.name,userName=entry.username,password="",email=entry.email, phone=entry.phone,adminLevel=entry.admin_level, createdAt=entry.created_at, updatedAt=entry.updated_at) for entry in admins]
+                raise HTTPException(status_code=400, detail="No data was found")
+            else:raise HTTPException(status_code=401, detail="Invalid Admin Level")
         raise HTTPException(status_code=401, detail="Invalid Administrator")
-    raise HTTPException(status_code=404, detail="No user found")
+    raise HTTPException(status_code=404, detail="No administrator found")
+
+
 
 def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
