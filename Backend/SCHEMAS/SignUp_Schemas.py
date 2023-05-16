@@ -95,7 +95,7 @@ class set_SignUp_Data(__Members_Inputs):
     type: str = "Member"
     created_at: datetime = datetime.now(pytz.timezone('America/Puerto_Rico'))
     competitions_form: str = "No"
-    membership_until: str = "Not paid"
+    membership_until: str = "Expired"
     membership_paid: str = "No"
 
     class Config:

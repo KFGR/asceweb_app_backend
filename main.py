@@ -17,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from Backend.TESTS import SignUp_Test,Competitions_Test, Test_Admins as ta
 from Backend.SCHEMAS import Administrators_Schemas, SignUp_Schemas, Competitions_Schema
 from Backend.CONFIG.connection import engine, Base, SessionLocal
-from pydantic import ValidationError
+from pydantic import ValidationError, SecretStr
 import json as json
 from jwt.exceptions import DecodeError, InvalidSignatureError
 
@@ -36,10 +36,10 @@ def get_db():
         db.close()
 
 @app.post("/ascepupr/login/user/form/user/logintodashboard/", response_model=Administrators_Schemas.Administrator_Validate_User)
-def loginAdmin(userName:str, passwd: str, token: str = None, db: Session = Depends(get_db)):
+def loginAdmin(userName:str, passwd: SecretStr, db: Session = Depends(get_db)):
     """Endpoint used to validate and authenticate administrator user by comparing the username and password to the ones in the database"""
     try:
-        data = ta.loginAdmin(db,admin = Administrators_Schemas.Administrator_LoginAccount_INPUTS(userName=userName,passwd=passwd,token=token))
+        data = ta.loginAdmin(db,admin = Administrators_Schemas.Administrator_LoginAccount_INPUTS(userName=userName,passwd=passwd))
         return {"status_code":HTTP_201_CREATED, 'body':data}
     except (ValidationError, Exception,DecodeError,InvalidSignatureError) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
@@ -141,7 +141,7 @@ def updateAdmins(userName: str, masterAdminToken: str, newPasswd: str = None, ne
 @app.put("/ascepupr/dashboard/admin/table/update/members/updatefrommember", response_model=Administrators_Schemas.Output_return)
 def updateMembers(token: str,email: str, newEmail: str = None, newPhone:str = None, newTshirt_size: str = None, newAge: int = None, newBachelor:str = None, newDepartment: str = None, newAcademic_Years: int = None, newMembership: str = None, db: Session = Depends(get_db)):
     try:
-        data = ta.updateMembers(db=db,user=Administrators_Schemas.Member_upate_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newTshirt_size=newTshirt_size, newAge=newAge, newBachelor=newBachelor, newDepartment=newDepartment, newAca_years=newAcademic_Years, newMembership=newMembership))
+        data = ta.updateMembers(db=db,user=Administrators_Schemas.Member_upate_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newTshirt_size=newTshirt_size, newAge=newAge, newBachelor=newBachelor, newDepartment=newDepartment, newAca_years=newAcademic_Years, newMembershipPaid=newMembership))
         return {"status_code":HTTP_201_CREATED, 'body':data}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
