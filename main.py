@@ -157,7 +157,7 @@ def updateCompetitionsMembers(token: str, email: str, newEmail: str = None, newP
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':str(e)}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
 
 

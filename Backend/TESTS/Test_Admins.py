@@ -211,7 +211,7 @@ def updateCompetitionsMembers(db: Session, user=adminSchema.Competitions_upate_t
             user_row = db.query(Competitions_Table).filter(Competitions_Table.email == user.email).first()
             if user_row:
                 user_chapter_row = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == user.email).first()
-                if not (user.newEmail or user.newPhone or user.newName):
+                if not (user.newEmail or user.newPhone or user.newOlder_than_twentyfive or user.newAscemember or user.newAscememberhip or user.newCompetition_name or user.newCompetitions_form or user.newCourses or user.newDaily_availability or user.newExperiences or user.newHeavy_driver or user.newOfficial_driver or user.newTravel_availability or user.newTravel_june):
                     raise HTTPException(status_code=204, detail="No data was changed")
                 
                 if user.newEmail is not None:
