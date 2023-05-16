@@ -119,50 +119,51 @@ def get_Competitions_Table(db: Session, admin: adminSchema.Administrator_MasterA
     raise HTTPException(status_code=404, detail="No user found")
 
 
-def delete_all_Members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
-    tmp = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
-    if tmp:
-        if __sc.validateToken(tmp[0],tmp[1],admin.masterAdminToken) == [True, True] and tmp[1] == "MA":
+def delete_members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
+    admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
+    if admin_user:
+        if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA":
             user_member = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == admin.email).first()
             if user_member:
                 comp_member = db.query(Competitions_Table).filter(Competitions_Table.email == admin.email).delete()
-                user_member.competitions_form = "No"
-                user_member = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == admin.email).delete()
-                db.commit()
-                return "Table was deleted"
-            raise HTTPException(status_code=404, detail="No user found")
-        raise HTTPException(status_code=401, detail="Invalid Administrator")
-    raise HTTPException(status_code=404, detail="Administrator not found found")
+                if comp_member:
+                    user_member.competitions_form = "No"
+                    db.delete(user_member)
+                    db.commit()
+                    return "User was deleted"
+                raise HTTPException(status_code=204, detail="No data deleted")
+            raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=401, detail="Invalid administrator")
+    raise HTTPException(status_code=404, detail="Administrator not found")
 
-def delete_all_competitionsMember(db:Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
-    tmp = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
-    if tmp:
-        if __sc.validateToken(tmp[0],tmp[1],admin.masterAdminToken) == [True, True] and tmp[1] == "MA" and tmp[2] != admin.email:
+def delete_competitionsMember(db:Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
+    admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
+    if admin_user:
+        if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA" and admin_user[2] != admin.email:
             user_member = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == admin.email).first()
-            
             if user_member:
                 user_member.competitions_form = 'No'
                 if(bool(db.query(Competitions_Table).filter(Competitions_Table.email == admin.email).delete())):
                     db.commit()
                     return "User was deleted"
-                raise HTTPException(status_code=404, detail="No user found")
-        raise HTTPException(status_code=401, detail="Invalid Administrator")
-    raise HTTPException(status_code=404, detail="Administrator not found found")
+                raise HTTPException(status_code=204, detail="No data deleted")
+            raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=401, detail="Invalid administrator")
+    raise HTTPException(status_code=404, detail="Administrator not found")
 
-def deleteAdminEntry(db: Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
-    if ValidateExist(db=db,user=admin):
-        tmp = db.query(Administrators_Table.username,Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
-        if tmp:
-            if __sc.validateToken(tmp[0], tmp[1], admin.masterAdminToken) == [True, True] and tmp[1] == "MA" and tmp[2] != admin.email:
-                tmp = db.query(Administrators_Table).filter(admin.email == Administrators_Table.email).first()
-                if tmp is None:
-                    raise HTTPException(status_code=404, detail="No user found")
-                db.query(Administrators_Table).filter(admin.email == Administrators_Table.email).delete()
-                db.commit()
-                return True
-            raise HTTPException(status_code=401, detail="Invalid Administrator")
-        raise HTTPException(status_code=404, detail="Administrator not found found")
-    raise HTTPException(status_code=204, detail="No data was changed")
+def delete_admin(db: Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
+    admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
+    if admin_user:
+        if __sc.validateToken(admin_user[0], admin_user[1], admin.masterAdminToken) == [True, True] and admin_user[1] == "MA" and admin_user[2] != admin.email:
+            tmp = db.query(Administrators_Table).filter(admin.email == Administrators_Table.email).first()
+            if tmp:
+                if(bool(db.query(Administrators_Table).filter(admin.email == Administrators_Table.email).delete())):
+                    db.commit()
+                    return "User deleted"
+                raise HTTPException(status_code=204, detail="No data deleted")
+            raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=401, detail="Invalid administrator")
+    raise HTTPException(status_code=404, detail="Administrator not found")
 
 
 def updateAdmin(db: Session, admin: adminSchema.Administrator_ChangePasswdEmail_DB):
@@ -370,6 +371,9 @@ def updateMembers(db: Session, user=adminSchema.Member_upate_table):
     raise Exception("Something went wrong") #goes directly to internal server error exception
     
 def isTokenValid(db: Session, admin=adminSchema.Administrator_MasterAdminToken):
-    tokenDict = __sc.decodeToken(admin.masterAdminToken)
-    validationState = __sc.validateToken(tokenDict["username"], tokenDict["level"], admin.masterAdminToken)
-    return validationState == [True,True]
+    if admin.token:
+        tokenDict = __sc.decodeToken(admin.masterAdminToken)
+        if __sc.validateToken(tokenDict["username"], tokenDict["level"], admin.masterAdminToken) == [True,True]:
+            return True
+        raise HTTPException(status_code=401, detail="Invalid token")
+    return False

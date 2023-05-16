@@ -8,7 +8,6 @@ class __Competitions_Inputs(Schema):
     """Private class to validate all inputs from the signup form"""
     name: str
     email: str
-    phone: str
     ascemembership: str
     competition_name: str
     courses: str

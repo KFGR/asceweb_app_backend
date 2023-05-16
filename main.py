@@ -49,7 +49,6 @@ def loginAdmin(userName:str, passwd: SecretStr, db: Session = Depends(get_db)):
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
 
-
 @app.post("/ascepupr/dashboard/user/create/admin/createadmin/",status_code=HTTP_201_CREATED, response_model=Administrators_Schemas.Output_return)
 def createAdmin(userName:str, passwd:str, name:str, email:str, phone: str, adminLevel: str, token: str, db: Session = Depends(get_db)):
     """Verificar si despues el token tiene que ser obligatorio"""
@@ -66,9 +65,9 @@ def createAdmin(userName:str, passwd:str, name:str, email:str, phone: str, admin
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
 @app.post("/ascepupr/competitions/form/signuptocompetition/", status_code=HTTP_201_CREATED, response_model=Administrators_Schemas.Output_return)
-def competitionSignUp(name: str, email: str, phone: str, asce_member:str ,ascemembership_number: str, competition_name: str, courses:str, experiences: str,daily_availability: str, travel_availability: str, travel_june:str,older_than_twentyfive:str,heavy_driver:str, official_driver:str, db: Session = Depends(get_db)):
+def competitionSignUp(name: str, email: str, asce_member:str ,ascemembership_number: str, competition_name: str, courses:str, experiences: str,daily_availability: str, travel_availability: str, travel_june:str,older_than_twentyfive:str,heavy_driver:str, official_driver:str, db: Session = Depends(get_db)):
     try:
-        data = Competitions_Test.put_Competition_Data(db=db,user=Competitions_Schema.set_Competitions_Data(name=name, email=email,phone=phone,asce_member=asce_member, ascemembership=ascemembership_number,competition_name=competition_name,courses=courses,experiences=experiences,daily_availability=daily_availability, travel_availability=travel_availability, travel_june=travel_june,older_than_twentyfive=older_than_twentyfive,heavy_driver=heavy_driver,official_driver=official_driver))
+        data = Competitions_Test.put_Competition_Data(db=db,user=Competitions_Schema.set_Competitions_Data(name=name, email=email,asce_member=asce_member, ascemembership=ascemembership_number,competition_name=competition_name,courses=courses,experiences=experiences,daily_availability=daily_availability, travel_availability=travel_availability, travel_june=travel_june,older_than_twentyfive=older_than_twentyfive,heavy_driver=heavy_driver,official_driver=official_driver))
         return {"status_code":HTTP_201_CREATED, 'body':data}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
@@ -95,9 +94,9 @@ def getAdmins(masterAdminToken: str, db: Session = Depends(get_db)):
     except (HTTPException,DecodeError,InvalidSignatureError) as e:
         if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
-        return {"status_code":500, 'body':"Invalid Server Error"}
+        return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.get("/ascepupr/dashboard/user/table/members/", response_model=Administrators_Schemas.Output_return)
+@app.get("/ascepupr/dashboard/user/table/members/",status_code=HTTP_200_OK, response_model=Administrators_Schemas.Output_return)
 def getMembers(masterAdminToken: str, db: Session = Depends(get_db)):
     try:
         data = ta.get_SignUp_Table(db=db, admin=Administrators_Schemas.Administrator_MasterAdminToken(masterAdminToken=masterAdminToken))
@@ -105,9 +104,9 @@ def getMembers(masterAdminToken: str, db: Session = Depends(get_db)):
     except (HTTPException,DecodeError,InvalidSignatureError) as e:
         if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
-        return {"status_code":500, 'body':"Invalid Server Error"}
+        return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.get("/ascepupr/dashboard/user/table/competitions/", response_model=Administrators_Schemas.Output_return)
+@app.get("/ascepupr/dashboard/user/table/competitions/", status_code=HTTP_200_OK,response_model=Administrators_Schemas.Output_return)
 def getCompetitionsMembers(masterAdminToken: str, db: Session = Depends(get_db)):
     try:
         data = ta.get_Competitions_Table(db=db, admin=Administrators_Schemas.Administrator_MasterAdminToken(masterAdminToken=masterAdminToken))
@@ -115,7 +114,7 @@ def getCompetitionsMembers(masterAdminToken: str, db: Session = Depends(get_db))
     except (HTTPException,DecodeError,InvalidSignatureError) as e:
         if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
-        return {"status_code":500, 'body':"Invalid Server Error"}
+        return {"status_code":500, 'body':"Internal Server Error"}
 
 @app.get("/ascewepupr/isTokenValid/", status_code=HTTP_200_OK, response_model=Administrators_Schemas.Output_return)
 def isTokenValid(masterAdminToken:str, db:Session = Depends(get_db)):
@@ -127,7 +126,7 @@ def isTokenValid(masterAdminToken:str, db:Session = Depends(get_db)):
         if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         else: return {"status_code": 500, "body": "Internal Server Error"}
 
-@app.put("/ascepupr/dashboard/admin/table/update/admin/updatefromadmin/", response_model=Administrators_Schemas.Output_return)
+@app.put("/ascepupr/dashboard/admin/table/update/admin/updatefromadmin/", status_code=HTTP_201_CREATED,response_model=Administrators_Schemas.Output_return)
 def updateAdmins(userName: str, masterAdminToken: str, newPasswd: str = None, newEmail: str = None,newPhone: str = None, newLevel: str = None,db: Session = Depends(get_db)):
     try:
         ta.updateAdmin(db=db,admin=Administrators_Schemas.Administrator_ChangePasswdEmail_INPUTS(userName=userName,masterAdminToken=masterAdminToken, newPasswd=newPasswd,newEmail=newEmail, newPhone=newPhone, newLevel=newLevel))
@@ -138,7 +137,7 @@ def updateAdmins(userName: str, masterAdminToken: str, newPasswd: str = None, ne
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
         else: return {"status_code":500, 'body':"Internal Server Error"}
     
-@app.put("/ascepupr/dashboard/admin/table/update/members/updatefrommember", response_model=Administrators_Schemas.Output_return)
+@app.put("/ascepupr/dashboard/admin/table/update/members/updatefrommember", status_code=HTTP_201_CREATED,response_model=Administrators_Schemas.Output_return)
 def updateMembers(token: str,email: str, newEmail: str = None, newPhone:str = None, newTshirt_size: str = None, newAge: int = None, newBachelor:str = None, newDepartment: str = None, newAcademic_Years: int = None, newMembership: str = None, db: Session = Depends(get_db)):
     try:
         data = ta.updateMembers(db=db,user=Administrators_Schemas.Member_upate_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newTshirt_size=newTshirt_size, newAge=newAge, newBachelor=newBachelor, newDepartment=newDepartment, newAca_years=newAcademic_Years, newMembershipPaid=newMembership))
@@ -147,9 +146,9 @@ def updateMembers(token: str,email: str, newEmail: str = None, newPhone:str = No
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':str(e)}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.put("/ascepupr/dashboard/admin/table/update/competitionsmember/updatefromcompetitionsmember", response_model=Administrators_Schemas.Output_return)
+@app.put("/ascepupr/dashboard/admin/table/update/competitionsmember/updatefromcompetitionsmember", status_code=HTTP_201_CREATED,response_model=Administrators_Schemas.Output_return)
 def updateCompetitionsMembers(token: str, email: str, newEmail: str = None, newPhone: str = None, newAscemember: str = None, newAscemembership: str = None,newCompetition_name:str = None, newCourses: str = None, newDaily_Avail: str = None, newTravel: str = None, newTravel_june: str = None, newOlder: str=None, newHeavy: str = None, newOffdriver: str = None, newCompetitions_form: str = None, newExperiences: str =None ,db: Session = Depends(get_db)):
     try:
         data = ta.updateCompetitionsMembers(db=db,user=Administrators_Schemas.Competitions_upate_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newAscemember=newAscemember, newAscemembership=newAscemembership, newCompetition_name=newCompetition_name, newCourses=newCourses, newDaily_availability=newDaily_Avail, newTravel_availability=newTravel, newOlder_than_twentyfive=newOlder, newHeavy_driver=newHeavy, newOfficial_driver=newOffdriver, newTravel_june=newTravel_june, newCompetitions_form=newCompetitions_form,newExperiences=newExperiences))
@@ -158,44 +157,45 @@ def updateCompetitionsMembers(token: str, email: str, newEmail: str = None, newP
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':str(e)}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.delete("/ascepupr/dashboard/admin/table/delete/admin/deleteadminfromtable/", response_model=Administrators_Schemas.Output_return)
+
+
+
+
+
+@app.delete("/ascepupr/dashboard/admin/table/delete/admin/deleteadminfromtable/", status_code=HTTP_200_OK,response_model=Administrators_Schemas.Output_return)
 def deleteAdmin(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
     try:
-        a = ta.deleteAdminEntry(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
-        if a == True:
-            return {"status_code":200, 'body':"Deletion was a success."}
-        return {"status_code":401, 'body': 'Deletion was not successful. Check if token and email were correct.'}
+        data = ta.delete_admin(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
+        return {"status_code":HTTP_200_OK, 'body':data}
     except (ValidationError, HTTPException, Exception) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':"Innternal Server Error"}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.delete("/ascepupr/dashboard/admin/table/delete/members/deletemembers/", response_model=Administrators_Schemas.Output_return)
+@app.delete("/ascepupr/dashboard/admin/table/delete/members/deletemembers/", status_code=HTTP_200_OK,response_model=Administrators_Schemas.Output_return)
 def deleteMembers(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
     try:
-        a = ta.delete_all_Members(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
-        if a == "Table was deleted":
-            return {"status_code":200, 'body':"Deletion was a success."}
-        return {"status_code":401, 'body': 'Deletion was not successful. Check if token and email were correct.'}
+        data = ta.delete_members(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
+        return {"status_code":HTTP_200_OK, 'body':data}
     except (ValidationError, HTTPException, Exception) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':"Innternal Server Error"}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.delete("/ascepupr/dashboard/admin/table/delete/competitionsmember/deletecompetitionsmember/", response_model=Administrators_Schemas.Output_return)
+@app.delete("/ascepupr/dashboard/admin/table/delete/competitionsmember/deletecompetitionsmember/", status_code=HTTP_200_OK,response_model=Administrators_Schemas.Output_return)
 def deleteCompetitions(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
     try:
-        a = ta.delete_all_competitionsMember(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
-        return {"status_code":200, "body":a}
+        data = ta.delete_competitionsMember(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
+        return {"status_code":HTTP_200_OK, "body":data}
     except (ValidationError, HTTPException, Exception) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':"Innternal Server Error"}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
 
 
