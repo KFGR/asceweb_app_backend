@@ -40,11 +40,12 @@ def loginAdmin(userName:str, passwd: str, token: str = None, db: Session = Depen
     """Endpoint used to validate and authenticate administrator user by comparing the username and password to the ones in the database"""
     try:
         data = ta.loginAdmin(db,admin = Administrators_Schemas.Administrator_LoginAccount_INPUTS(userName=userName,passwd=passwd,token=token))
-        return {"status_code":data[0], 'body':data[1]}
+        return {"status_code":HTTP_201_CREATED, 'body':data}
     except (ValidationError, Exception,DecodeError,InvalidSignatureError) as e:
-        if type(e) == ValidationError: return {'status_code':404 ,'body':json.loads(e.json())[0]['msg']}
+        if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == Exception: return {"status_code":404, 'body':str(e)}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
 
@@ -116,14 +117,15 @@ def getCompetitionsMembers(masterAdminToken: str, db: Session = Depends(get_db))
         if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         return {"status_code":500, 'body':"Invalid Server Error"}
 
-@app.get("/ascewepupr/isTokenValid/", status_code=HTTP_200_OK)
+@app.get("/ascewepupr/isTokenValid/", status_code=HTTP_200_OK, response_model=Administrators_Schemas.Output_return)
 def isTokenValid(masterAdminToken:str, db:Session = Depends(get_db)):
     try:
-        print(masterAdminToken)
         data = ta.isTokenValid(db, admin=Administrators_Schemas.Administrator_MasterAdminToken(masterAdminToken=masterAdminToken))
-        return {"status_code": 200, "body": data}
-    except:
-        return {"status_code": 500, "body": "Internal Server Error"}
+        return {"status_code": HTTP_200_OK, "body": data}
+    except(Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
+        if type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        if type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        else: return {"status_code": 500, "body": "Internal Server Error"}
 
 @app.put("/ascepupr/dashboard/admin/table/update/admin/updatefromadmin/", response_model=Administrators_Schemas.Output_return)
 def updateAdmins(userName: str, masterAdminToken: str, newPasswd: str = None, newEmail: str = None,newPhone: str = None, newLevel: str = None,db: Session = Depends(get_db)):
@@ -165,12 +167,11 @@ def deleteAdmin(masterAdminToken: str, email: str, db:Session = Depends(get_db))
         if a == True:
             return {"status_code":200, 'body':"Deletion was a success."}
         return {"status_code":401, 'body': 'Deletion was not successful. Check if token and email were correct.'}
-    except (ValidationError, ValueError, HTTPException, Exception) as e:
-        if type(e) == ValidationError: return {'status_code':400 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
-        elif type(e) == ValueError: return {'status_code': 400,'body':str(e)}
-        elif type(e) == Exception: return {'status_code': 400,'body':str(e)}
-        elif type(e) == HTTPException: return {"status_code":400, 'body':e.detail}
-        else: return {"status_code":404, 'body':"Invalid {}".format(str(e).split()[1])}
+    except (ValidationError, HTTPException, Exception) as e:
+        if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
+        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        else: return {"status_code":500, 'body':"Innternal Server Error"}
 
 @app.delete("/ascepupr/dashboard/admin/table/delete/members/deletemembers/", response_model=Administrators_Schemas.Output_return)
 def deleteMembers(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
@@ -179,78 +180,24 @@ def deleteMembers(masterAdminToken: str, email: str, db:Session = Depends(get_db
         if a == "Table was deleted":
             return {"status_code":200, 'body':"Deletion was a success."}
         return {"status_code":401, 'body': 'Deletion was not successful. Check if token and email were correct.'}
-    except (ValidationError, ValueError, HTTPException, Exception) as e:
-        if type(e) == ValidationError: return {'status_code':400 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
-        elif type(e) == ValueError: return {'status_code': 400,'body':str(e)}
-        elif type(e) == Exception: return {'status_code': 400,'body':str(e)}
-        elif type(e) == HTTPException: return {"status_code":400, 'body':e.detail}
-        else: return {"status_code":404, 'body':str(e)}
+    except (ValidationError, HTTPException, Exception) as e:
+        if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
+        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        else: return {"status_code":500, 'body':"Innternal Server Error"}
 
 @app.delete("/ascepupr/dashboard/admin/table/delete/competitionsmember/deletecompetitionsmember/", response_model=Administrators_Schemas.Output_return)
 def deleteCompetitions(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
     try:
         a = ta.delete_all_competitionsMember(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
         return {"status_code":200, "body":a}
-    except (ValidationError, ValueError, HTTPException, Exception) as e:
-        if type(e) == ValidationError: return {'status_code':400 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
-        elif type(e) == ValueError: return {'status_code': 400,'body':str(e)}
-        elif type(e) == Exception: return {'status_code': 400,'body':str(e)}
-        elif type(e) == HTTPException: return {"status_code":400, 'body':e.detail}
-        else: return {"status_code":404, 'body':traceback.format_exc(e)}
+    except (ValidationError, HTTPException, Exception) as e:
+        if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
+        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        else: return {"status_code":500, 'body':"Innternal Server Error"}
 
-# @app.delete("/ASCEPUPR/ADMIN/DEL_ALL/", response_model=Administrators_Schemas.Output_return)
-# def deleteAdmin(masterAdminToken: str, db:Session = Depends(get_db)):
-#     '''
-#         What I remember about the rise of the Empire is ... is how quiet it was. During the waning hours of the Clone Wars, 
-#         the 501st Legion was discreetly transferred back to Coruscant. It was a silent trip. We all knew what was about to 
-#         happen, and what we were about to do. Did we have any doubts? Any private, traitorous thoughts? Perhaps, but no one 
-#         said a word. Not on the flight to Coruscant, not when Order 66 came down, and not when we marched into the Jedi Temple. 
-#         Not a word.
 
-#         This will not delete master admins for security measure.
-#     '''
-#     try:
-#         a = ta.deleteAdminAll(db=db, admin = Administrators_Schemas.Administrator_MasterAdminToken(masterAdminToken=masterAdminToken))
-#         if a == True:
-#             return {"status_code":200, 'body':"Deletion was a success."}
-#         return {"status_code":401, 'body': 'Deletion was not successful. Check if token is correct.'}
-#     except (ValidationError, ValueError, HTTPException, Exception) as e:
-#         if type(e) == ValidationError: return {'status_code':400 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
-#         elif type(e) == ValueError: return {'status_code': 400,'body':str(e)}
-#         elif type(e) == Exception: return {'status_code': 400,'body':str(e)}
-#         elif type(e) == HTTPException: return {"status_code":400, 'body':e.detail}
-#         else: return {"status_code":404, 'body':"Invalid {}".format(str(e).split()[1])}
-# "Invalid {}".format(str(e).split()[1])
-        # else: return {"status_code":404, 'body': "Invalid {}".format(str(e).split()[1])}
-    # except Exception as e:
-    #     return {'response': 500, 'message': repr(e)}    # I left this since this can help us, still. It can be deleted later on.
-
-# @app.post("/ASCEPUPR/ADMIN/CREATE_ACCOUNT/", response_model=Administrators_Schemas.Output_return)
-# def createAdmin(userName:str, passwd:str, name:str, email:str, phone:str, adminLevel:str,masterAdminToken:str, db: Session = Depends(get_db)):
-#     try:
-#         admin = Administrators_Schemas.Administrator_CreateAccount_INPUTS(userName=userName, passwd=passwd,name=name,email=email,phone=phone,adminLevel=adminLevel, masterAdminToken=masterAdminToken)
-#         dbAdmin = ta.getAdminbyEmail(db, email=admin.email)
-#         if dbAdmin:
-#             raise HTTPException(status_code=409, detail="Email already registered")
-#         dbAdmin = ta.getAdminbyUserName(db, username=admin.userName)
-#         if dbAdmin:
-#             raise HTTPException(status_code=409, detail="User Name already registered")
-#         dbAdmin = ta.getAdminbyUserName(db, username=admin.phone)
-#         if dbAdmin:
-#             raise HTTPException(status_code=409, detail="Phone already registered")
-#         if ta.createAdmin(db=db, admin=admin):
-#             return {'status_code':201, 'body':"User created"}
-#         else:
-#             raise Exception
-#     except (ValidationError, ValueError,HTTPException,IntegrityError, Exception) as e:
-#         if type(e) == ValidationError: return {'status_code':400 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
-#         elif type(e) == ValueError: return {'status_code': 400,'body':str(e)}
-#         elif type(e) == Exception: return {'status_code': 400,'body':str(e)}
-#         elif type(e) == HTTPException: return {"status_code":400, 'body':e.detail}
-#         elif type(e) == IntegrityError: return {"status_code":404, 'body': "duplicate entry"}
-#         else: return {"status_code":404, 'body':"Invalid {}".format(str(e).split()[1])}
-    # except Exception as e:
-    #     return {'response': 500, 'message': repr(e)}    # I left this since this can help us, still. It can be deleted later on.
 
 if __name__ == "__main__":
     import uvicorn

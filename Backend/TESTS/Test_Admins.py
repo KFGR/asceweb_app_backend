@@ -72,17 +72,13 @@ def createAdmin(db:Session, admin: adminSchema.Administrator_CreateAccount_DB):
 def loginAdmin(db: Session, admin: adminSchema.Administrator_LoginAccount_DB) -> list:
     """Validate username and password as well as token to return either an invalid login or valid login"""
     db_information = db.query(Administrators_Table.username, Administrators_Table.password, Administrators_Table.admin_level).filter(Administrators_Table.username == admin.userName).first()
-    if db_information is not None and __sc.validateUsername(admin.userName, db_information[0]) and __sc.validateHash(admin.passwd.get_secret_value(), str(db_information[1])):
-        if( admin.token == None):
-            return [201, __sc.createToken({'username': admin.userName, 'admin_level':str(db_information[2])}), admin.userName]
-        elif admin.token and __sc.validateToken(admin.userName,db_information[2],admin.token) == [True, True]:
-            return [200, "Successful Authenticacion!", admin.userName]
-        elif admin.token and __sc.validateToken(admin.userName,db_information[2],admin.token) == [True, False]:
-            return [201, __sc.createToken({'username': admin.userName, 'admin_level':db_information[2]}), admin.userName]
-        elif admin.token and __sc.validateToken(admin.userName,db_information[2],admin.token) == [False, True]:
-            return [401, "Unauthorized", ""]
-    else:
-        return [401, "Invalid Username or Password", ""]
+    if db_information:
+        if __sc.validateUsername(admin.userName, db_information[0]) and __sc.validateHash(admin.passwd.get_secret_value(), str(db_information[1])):
+            data = __sc.validateToken(admin.userName,db_information[2],admin.token)
+            return data
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+    raise HTTPException(status_code=404, detail="No username found")
+    
 
 
 
@@ -371,4 +367,4 @@ def updateMembers(db: Session, user=adminSchema.Member_upate_table):
 def isTokenValid(db: Session, admin=adminSchema.Administrator_MasterAdminToken):
     tokenDict = __sc.decodeToken(admin.masterAdminToken)
     validationState = __sc.validateToken(tokenDict["username"], tokenDict["level"], admin.masterAdminToken)
-    return validationState
+    return validationState == [True,True]
