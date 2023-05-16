@@ -73,7 +73,7 @@ def competitionSignUp(name: str, email: str, asce_member:str ,ascemembership_num
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         # elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':str(e)}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
 @app.post("/ascewepupr/signup/form/signuptochapter/", status_code=HTTP_201_CREATED,response_model=Administrators_Schemas.Output_return)
 def chapterSignUp(name: str, email: str, phone:str, tshirt_size: str, age: int, bachelor:str, department: str, Academic_Years: int, db: Session = Depends(get_db)):
@@ -157,7 +157,7 @@ def updateCompetitionsMembers(token: str, email: str, newEmail: str = None, newP
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':"Internal Server Error"}
+        else: return {"status_code":500, 'body':str(e)}
 
 
 
