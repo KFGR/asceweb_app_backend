@@ -11,9 +11,9 @@ def ValidateExist(db:Session, user: set_SignUp_Data):
     if db_profile:
         print(type(db_profile.email), type(user.email))
         if db_profile.email == user.email:
-            raise HTTPException(status_code=422, detail='Email already exist')
+            raise HTTPException(status_code=409, detail='Email already exist')
         if db_profile.phone == user.phone:
-            raise  HTTPException(status_code=422, detail='Phone already exist')
+            raise  HTTPException(status_code=409, detail='Phone already exist')
     else:
         return False
 
