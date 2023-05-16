@@ -9,7 +9,6 @@ def ValidateExist(db:Session, user: set_SignUp_Data):
     """Returns false if user does not exist, else raise exception if username, phone or email exist"""
     db_profile = db.query(Chapter_Members_Table).filter(or_(Chapter_Members_Table.email == user.email,Chapter_Members_Table.phone == user.phone)).first()
     if db_profile:
-        print(type(db_profile.email), type(user.email))
         if db_profile.email == user.email:
             raise HTTPException(status_code=409, detail='Email already exist')
         if db_profile.phone == user.phone:

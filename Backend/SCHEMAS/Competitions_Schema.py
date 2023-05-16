@@ -33,7 +33,7 @@ class __Competitions_Inputs(Schema):
      if value[0].isspace() or value[-1].isspace():
          raise ValueError("No spaces allowed at the beginning or end of name")
      if any(v[0].islower() for v in value.split()):
-         raise ValueError("All parts of any name should contain upper - case characters.")
+         raise ValueError("Both name and lastname should begin with uppercase letter")
      if any(not v.isalpha() and not v.isspace() for v in value):
          raise ValueError("A name only contains letters.")
      return value

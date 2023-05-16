@@ -371,9 +371,13 @@ def updateMembers(db: Session, user=adminSchema.Member_upate_table):
     raise Exception("Something went wrong") #goes directly to internal server error exception
     
 def isTokenValid(db: Session, admin=adminSchema.Administrator_MasterAdminToken):
+    """cambiar esta funcion para buscar que el admin realmente este en la tabla"""
     if admin.token:
         tokenDict = __sc.decodeToken(admin.masterAdminToken)
         if __sc.validateToken(tokenDict["username"], tokenDict["level"], admin.masterAdminToken) == [True,True]:
-            return True
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return False
+            admin_user = db.query(Administrators_Table).filter(Administrators_Table.username==tokenDict['username']).first()
+            if admin_user.username == tokenDict['username'] and admin_user.admin_level == tokenDict['level']:
+                return True
+            raise HTTPException(status_code=401, detail="Invalid Administrator")
+        raise HTTPException(status_code=401,detail="Invalid Token")
+    raise HTTPException(status_code=401,detail="No token received")

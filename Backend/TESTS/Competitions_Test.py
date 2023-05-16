@@ -10,7 +10,6 @@ def ValidateExist(db:Session, user: set_Competitions_Data):
     """Returns false if user does not exist, else raise exception if username, phone or email exist"""
     db_profile = db.query(Competitions_Table).filter(or_(Competitions_Table.email == user.email, Competitions_Table.ascemembership == user.ascemembership)).first()
     if db_profile:
-        print(type(db_profile.email), type(user.email))
         if db_profile.email == user.email:
             raise HTTPException(status_code=409, detail='Email already exist')
         if db_profile.ascemembership == user.ascemembership:
