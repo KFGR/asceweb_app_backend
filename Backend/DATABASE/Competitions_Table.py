@@ -12,8 +12,6 @@ class Competitions_Table(Base):
     name = Column(String(55), ForeignKey('chapter_members.name'))
     email = Column(String(100), ForeignKey('chapter_members.email'))
     phone = Column(String(15), ForeignKey('chapter_members.phone'))
-    # chapter_members = relationship("Chapter_Members_Table", backref="competitions", foreign_keys=[idchapter_members, name, email, phone])
-    # chapter_members = relationship("Chapter_Members_Table", backref='competitions', foreign_keys=[Chapter_Members_Table.idchapter_members, Chapter_Members_Table.name, Chapter_Members_Table.email, Chapter_Members_Table.phone], primaryjoin="and_(Chapter_Members_Table.idchapter_members==Competitions_Table.idchapter_members, Chapter_Members_Table.name==Competitions_Table.name, Chapter_Members_Table.email==Competitions_Table.email, Chapter_Members_Table.phone==Competitions_Table.phone)")
 
     ascemembership = Column(String, unique=True, nullable=False)
     competition_name = Column(String(100), nullable=False)
@@ -28,5 +26,7 @@ class Competitions_Table(Base):
     offdriver_avail = Column(Enum('Yes','No'), nullable=False)
     competitions_form = Column(Enum('Yes','No'), nullable=False)
     created_at = Column(DATETIME, nullable=False)
+
+
 
 

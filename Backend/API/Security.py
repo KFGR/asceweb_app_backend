@@ -44,7 +44,7 @@ class Secuirity:
                 hours: the number of hours in the duration (equivalent to seconds / 3600)
                 weeks: the number of weeks in the duration (equivalent to days / 7)
         """
-        return datetime.now(pytz.timezone('America/Puerto_Rico')) + timedelta(minutes=120)
+        return datetime.now(pytz.timezone('America/Puerto_Rico')) + timedelta(days=7)
 
     def createToken(self, data: dict):
         """Function to create a token in JWT format"""
@@ -68,7 +68,7 @@ class Secuirity:
         Payload = self.decodeToken(token=token)
         expiration_time = datetime.fromtimestamp(Payload['exp_date'], pytz.timezone('America/Puerto_Rico'))
         current_time = datetime.now(pytz.timezone('America/Puerto_Rico'))
-        return [Payload['username'] == username and Payload['level'] == role, current_time< expiration_time]
+        return [Payload['username'] == username and Payload['level'] == role, (expiration_time.day - current_time.day) > 1]
             
 
 if __name__ == "__main__":

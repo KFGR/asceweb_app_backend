@@ -4,11 +4,11 @@ import pytz, re
 from typing import Any
 
 
-class __Members_Inputs(Schema):
+class __Competitions_Inputs(Schema):
     """Private class to validate all inputs from the signup form"""
     name: str
     email: str
-    phone: str = None
+    phone: str
     ascemembership: str
     competition_name: str
     courses: str
@@ -148,7 +148,7 @@ class __Members_Inputs(Schema):
         else:
             return value
 
-class set_Competitions_Data(__Members_Inputs):
+class set_Competitions_Data(__Competitions_Inputs):
     """Setter to be used to enter signup data to database"""
     created_at: datetime = datetime.now(pytz.timezone('America/Puerto_Rico'))
     competitions_form: str = "Yes"
