@@ -330,7 +330,7 @@ class Competitions_upate_table(Schema):
     newEmail: str = None
     newPhone: str = None
     newAscemember: str = None
-    newAscememberhip: str = None
+    newAscemembership: str = None
     newCompetition_name: str = None
     newCourses: str = None
     newDaily_availability: str = None

@@ -13,7 +13,7 @@
 import traceback
 from fastapi import Depends, FastAPI, HTTPException, Response
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy import exc
 from Backend.TESTS import SignUp_Test,Competitions_Test, Test_Admins as ta
 from Backend.SCHEMAS import Administrators_Schemas, SignUp_Schemas, Competitions_Schema
 from Backend.CONFIG.connection import engine, Base, SessionLocal
@@ -44,7 +44,7 @@ def loginAdmin(userName:str, passwd: SecretStr, db: Session = Depends(get_db)):
     except (ValidationError, Exception,DecodeError,InvalidSignatureError) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
         elif type(e) == Exception: return {"status_code":404, 'body':str(e)}
-        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        # elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {'status_code':e.status_code, 'body':e.detail}
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
