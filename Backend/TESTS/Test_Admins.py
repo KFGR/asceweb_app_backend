@@ -49,6 +49,8 @@ def ValidateExist(db:Session,table: str, user: Union[adminSchema.Administrator_L
                 raise HTTPException(status_code=409, detail='Email already exist')
             if db_profile.phone == user.newPhone:
                 raise  HTTPException(status_code=409, detail='Phone already exist')
+            if db_profile.asce_member == user.newAscemember:
+                raise  HTTPException(status_code=409, detail='Membership already exist')
         return False
     raise Exception("Table {} does not exist".format(table))
 
@@ -237,10 +239,10 @@ def updateCompetitionsMembers(db: Session, user=adminSchema.Competitions_upate_t
                         user_chapter_row.phone = user_row.phone
                     else:
                         raise HTTPException(status_code=409, detail="The user is already using this phone number")
-                
+                    
                 if user.newAscemembership is not None:
                     if user.newAscemembership != user_row.ascemembership:
-                        user_row.ascemembersship = user.newAscemembership
+                        user_row.ascemembership = user.newAscemembership
                     else:
                         raise HTTPException(status_code=409, detail="The user is already registered to the ASCE using this number")
                 
@@ -258,7 +260,7 @@ def updateCompetitionsMembers(db: Session, user=adminSchema.Competitions_upate_t
                 
                 if user.newDaily_availability is not None:
                     if user.newDaily_availability != user_row.daily_avail:
-                        user_row.daily_vail = user.newDaily_availability
+                        user_row.daily_avail = user.newDaily_availability
                     else:
                         raise HTTPException(status_code=409, detail="The user is already available during the same days")
                 
