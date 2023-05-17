@@ -20,9 +20,8 @@ from Backend.CONFIG.connection import engine, Base, SessionLocal
 from pydantic import ValidationError, SecretStr
 import json as json
 from jwt.exceptions import DecodeError, InvalidSignatureError
-
 from starlette.status import HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND, HTTP_200_OK, HTTP_500_INTERNAL_SERVER_ERROR, HTTP_409_CONFLICT, HTTP_201_CREATED
-# chapter_members.Base.metadata.create_all(bind=connection.engine)
+
 Base.metadata.create_all(bind = engine)
 
 app = FastAPI()
@@ -140,7 +139,7 @@ def updateAdmins(userName: str, masterAdminToken: str, newPasswd: str = None, ne
 @app.put("/ascepupr/dashboard/admin/table/update/members/updatefrommember", status_code=HTTP_201_CREATED,response_model=Administrators_Schemas.Output_return)
 def updateMembers(token: str,email: str, newEmail: str = None, newPhone:str = None, newTshirt_size: str = None, newAge: int = None, newBachelor:str = None, newDepartment: str = None, newAcademic_Years: int = None, newMembership: str = None, db: Session = Depends(get_db)):
     try:
-        data = ta.updateMembers(db=db,user=Administrators_Schemas.Member_upate_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newTshirt_size=newTshirt_size, newAge=newAge, newBachelor=newBachelor, newDepartment=newDepartment, newAca_years=newAcademic_Years, newMembershipPaid=newMembership))
+        data = ta.updateMembers(db=db,user=Administrators_Schemas.Member_update_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newTshirt_size=newTshirt_size, newAge=newAge, newBachelor=newBachelor, newDepartment=newDepartment, newAca_years=newAcademic_Years, newMembershipPaid=newMembership))
         return {"status_code":HTTP_201_CREATED, 'body':data}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}
@@ -151,7 +150,7 @@ def updateMembers(token: str,email: str, newEmail: str = None, newPhone:str = No
 @app.put("/ascepupr/dashboard/admin/table/update/competitionsmember/updatefromcompetitionsmember", status_code=HTTP_201_CREATED,response_model=Administrators_Schemas.Output_return)
 def updateCompetitionsMembers(token: str, email: str, newEmail: str = None, newPhone: str = None, newAscemember: str = None, newAscemembership: str = None,newCompetition_name:str = None, newCourses: str = None, newDaily_Avail: str = None, newTravel: str = None, newTravel_june: str = None, newOlder: str=None, newHeavy: str = None, newOffdriver: str = None, newCompetitions_form: str = None, newExperiences: str =None ,db: Session = Depends(get_db)):
     try:
-        data = ta.updateCompetitionsMembers(db=db,user=Administrators_Schemas.Competitions_upate_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newAscemember=newAscemember, newAscemembership=newAscemembership, newCompetition_name=newCompetition_name, newCourses=newCourses, newDaily_availability=newDaily_Avail, newTravel_availability=newTravel, newOlder_than_twentyfive=newOlder, newHeavy_driver=newHeavy, newOfficial_driver=newOffdriver, newTravel_june=newTravel_june, newCompetitions_form=newCompetitions_form,newExperiences=newExperiences))
+        data = ta.updateCompetitionsMembers(db=db,user=Administrators_Schemas.Competitions_update_table(masterAdminToken=token, email=email, newEmail=newEmail, newPhone=newPhone, newAscemember=newAscemember, newAscemembership=newAscemembership, newCompetition_name=newCompetition_name, newCourses=newCourses, newDaily_availability=newDaily_Avail, newTravel_availability=newTravel, newOlder_than_twentyfive=newOlder, newHeavy_driver=newHeavy, newOfficial_driver=newOffdriver, newTravel_june=newTravel_june, newCompetitions_form=newCompetitions_form,newExperiences=newExperiences))
         return {"status_code":HTTP_201_CREATED, 'body':"User updated"}
     except (ValidationError, ValueError, Exception,DecodeError,InvalidSignatureError, HTTPException) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':json.loads(e.json())[0]['msg']}

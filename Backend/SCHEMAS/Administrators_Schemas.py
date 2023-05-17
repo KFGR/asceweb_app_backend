@@ -212,7 +212,7 @@ class Administrator_ChangePasswdEmail_INPUTS(Schema):
 
 
 
-class Member_upate_table(Schema):
+class Member_update_table(Schema):
     email: str
     newEmail: str = None
     newPhone: str = None
@@ -325,7 +325,7 @@ class Member_upate_table(Schema):
     class Config:
         orm_mode = True
 
-class Competitions_upate_table(Schema):
+class Competitions_update_table(Schema):
     email: str
     newEmail: str = None
     newPhone: str = None
@@ -451,6 +451,8 @@ class Administrator_CreateAccount_DB(Schema):
 
     masterAdminToken: str
 
+    """validaciones de las variables"""
+
     class Config:
         orm_mode = True
 
@@ -493,41 +495,41 @@ class Administrator_ChangePasswdEmail_DB(Schema):
     class Config:
         orm_mode = True
 
-# class Administrator_ChangeName_DB(Schema):
-#     userName: str
-#     name: str
-#     updatedAt: dt.datetime
+class Member_update(Schema):
+    email: str
+    newEmail: str = None
+    newPhone: str = None
+    newTshirt_size: str = None
+    newAge: int = None
+    newBachelor: str = None
+    newDepartment: str = None
+    newAca_years: int = None
+    newMembershipPaid: str = None
 
-#     masterAdminToken: str
+    masterAdminToken: str
+    class Config:
+        orm_mode = True
 
-#     class Config:
-#         orm_mode = True
-
-# class Administrator_ChangeEmail_DB(Schema):
-#     userName: str
-#     email: str
-#     updatedAt: dt.datetime
-
-#     masterAdminToken: str
-
-#     class Config:
-#         orm_mode = True
-
-# class Administrator_ChangeAll_DB(Schema):
-#     userName: str
-    
-#     newPasswd: SecretStr
-#     newName: str
-#     newEmail: str
-#     newLevel: str
-#     updatedAt: dt.datetime
-
-#     masterAdminToken: str
-
-#     class Config:
-#         orm_mode = True
+class Competitions_update(Schema):
+    email: str
+    newEmail: str = None
+    newPhone: str = None
+    newAscemember: str = None
+    newAscemembership: str = None
+    newCompetition_name: str = None
+    newCourses: str = None
+    newDaily_availability: str = None
+    newTravel_availability: str = None
+    newOlder_than_twentyfive: str = None
+    newHeavy_driver: str = None
+    newOfficial_driver: str = None
+    newTravel_june: str = None
+    newCompetitions_form: str = None
+    newExperiences: str = None
 
 
+    class Config:
+        orm_mode = True
 
 class get_SignUp_Data(Schema):
     """Getter to be used to return signup data from database"""

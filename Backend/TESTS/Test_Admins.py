@@ -8,6 +8,7 @@ from Backend.API.Security import Secuirity as sc
 from fastapi import HTTPException
 from typing import Union
 from datetime import datetime as dt
+from dateutil.relativedelta import relativedelta
 __sc = sc()
 '''
     If working properly, functions to be moved elsewhere in the future.
@@ -106,7 +107,6 @@ def getAdmins(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     raise HTTPException(status_code=404, detail="No administrator found")
 
 
-
 def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminToken):
     admin_user = db.query(Administrators_Table.username,Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
     if admin_user:
@@ -130,7 +130,6 @@ def get_Competitions_Table(db: Session, admin: adminSchema.Administrator_MasterA
         raise HTTPException(status_code=401, detail="Invalid Administrator")
     raise HTTPException(status_code=404, detail="No user found")
 
-
 def delete_members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
     admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
     if admin_user:
@@ -140,6 +139,7 @@ def delete_members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INP
                 comp_member = db.query(Competitions_Table).filter(Competitions_Table.email == admin.email).delete()
                 if comp_member:
                     user_member.competitions_form = "No"
+                else:
                     db.delete(user_member)
                     db.commit()
                     return "User was deleted"
@@ -216,7 +216,7 @@ def updateAdmin(db: Session, admin: adminSchema.Administrator_ChangePasswdEmail_
         else:raise HTTPException(status_code=401, detail="Invalid Administrator")
     raise Exception("Something went wrong") #goes directly to internal server error exception
 
-def updateCompetitionsMembers(db: Session, user=adminSchema.Competitions_upate_table):
+def updateCompetitionsMembers(db: Session, user:adminSchema.Competitions_update):
     if not ValidateExist(db=db,table="UpdateCompetitionsSignUp", user=user):
         admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(user.masterAdminToken)['username']).first()
         if admin_user and __sc.validateToken(admin_user[0], admin_user[1], user.masterAdminToken) == [True, True] and admin_user[1] == "MA":
@@ -309,6 +309,8 @@ def updateCompetitionsMembers(db: Session, user=adminSchema.Competitions_upate_t
                 if user.newCompetitions_form is not None:
                     if user.newCompetitions_form != user_row.competitions_form:
                         user_row.competitions_form = user.newCompetitions_form
+                        user_chapter_row = user.newCompetitions_form
+                        """cambiar row de mmebers a no"""
                     else:
                         raise HTTPException(status_code=409, detail="The user's availabilty to be the organization official driver is the same")
                 
@@ -321,7 +323,7 @@ def updateCompetitionsMembers(db: Session, user=adminSchema.Competitions_upate_t
     raise Exception("Something went wrong") #goes directly to internal server error exception
 
 
-def updateMembers(db: Session, user=adminSchema.Member_upate_table):
+def updateMembers(db: Session, user:adminSchema.Member_update):
     """Email, phone and id are unique"""
     if not ValidateExist(db=db,table="UpdateChapterMember", user=user):
         admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(user.masterAdminToken)['username']).first()
@@ -370,7 +372,7 @@ def updateMembers(db: Session, user=adminSchema.Member_upate_table):
                     if user.newMembershipPaid != user_row.membership_paid:
                         user_row.membership_paid = user.newMembershipPaid
                         if user.newMembershipPaid == "Yes":
-                            user_row.membership_until = str(dt.now().date())
+                            user_row.membership_until = str(dt.now().date() + relativedelta(years=1))
                         else:
                             user_row.membership_until = "Expired"
                     else: raise HTTPException(status_code=409, detail="This user is already using this membership value")

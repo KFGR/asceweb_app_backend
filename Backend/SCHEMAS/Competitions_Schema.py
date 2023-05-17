@@ -38,7 +38,6 @@ class __Competitions_Inputs(Schema):
          raise ValueError("A name only contains letters.")
      return value
     
-
     @validator('email', allow_reuse=True)
     def validate_email(cls, value: str):
         if value:
@@ -64,15 +63,6 @@ class __Competitions_Inputs(Schema):
             raise ValueError("An User Name must contain alphabetic and numeric characters.")
         """Validar para caracteres"""
         return value
-        
-    # @validator('department', allow_reuse=True,check_fields=False)
-    # def validate_department(cls, value: str):
-    #     if value[0].isspace() or value[-1].isspace():
-    #         raise ValueError("No spaces allowed on department")
-    #     if any(not v.isalpha() for v in value):
-    #         raise ValueError("Invalid department name")
-    #     else:
-    #         return value
         
     @validator('competition_name: str', allow_reuse=True,check_fields=False)
     def validate_competition(cls, value: str):
