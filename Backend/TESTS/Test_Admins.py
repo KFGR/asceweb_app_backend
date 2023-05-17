@@ -15,7 +15,7 @@ __sc = sc()
 '''
 
 
-def ValidateExist(db:Session,table: str, user: Union[adminSchema.Administrator_LoginAccount_DB, adminSchema.Member_upate_table,adminSchema.Administrator_ChangePasswdEmail_DB, adminSchema.Competitions_upate_table]):
+def ValidateExist(db:Session,table: str, user: Union[adminSchema.Administrator_LoginAccount_DB, adminSchema.Member_update,adminSchema.Administrator_ChangePasswdEmail_DB, adminSchema.Competitions_update]):
     """Returns false if user does not exist, else raise exception if username, phone or email exist"""
     if table == "CreateAdmin":
         db_profile = db.query(Administrators_Table).filter(or_(Administrators_Table.email == user.email,Administrators_Table.username == user.userName,Administrators_Table.phone == user.phone)).first()
@@ -309,7 +309,7 @@ def updateCompetitionsMembers(db: Session, user:adminSchema.Competitions_update)
                 if user.newCompetitions_form is not None:
                     if user.newCompetitions_form != user_row.competitions_form:
                         user_row.competitions_form = user.newCompetitions_form
-                        user_chapter_row = user.newCompetitions_form
+                        user_chapter_row.competitions_form = user.newCompetitions_form
                         """cambiar row de mmebers a no"""
                     else:
                         raise HTTPException(status_code=409, detail="The user's availabilty to be the organization official driver is the same")
