@@ -28,7 +28,7 @@ origins = [
 
 """Add the allowed origins IP's to the fastapi application variable """
 app.add_middleware(
-    CORSMiddleware(origins)
+    CORSMiddleware(origins,allow_methods=["*"], allow_headers=["*"])
 )
 
 #dependency
