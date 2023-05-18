@@ -1,5 +1,6 @@
 import traceback
 from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import exc
 from Backend.TESTS import SignUp_Test,Competitions_Test, Test_Admins as ta
@@ -13,6 +14,18 @@ from starlette.status import HTTP_204_NO_CONTENT, HTTP_404_NOT_FOUND, HTTP_200_O
 Base.metadata.create_all(bind = engine)
 
 app = FastAPI()
+
+origins = [
+    "https://ajeto.azurewebsites.net/"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 #dependency
 def get_db():
