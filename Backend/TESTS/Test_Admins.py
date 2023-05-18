@@ -139,11 +139,9 @@ def delete_members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INP
                 comp_member = db.query(Competitions_Table).filter(Competitions_Table.email == admin.email).delete()
                 if comp_member:
                     user_member.competitions_form = "No"
-                else:
-                    db.delete(user_member)
-                    db.commit()
-                    return "User was deleted"
-                raise HTTPException(status_code=204, detail="No data deleted")
+                db.delete(user_member)
+                db.commit()
+                return "User was deleted"
             raise HTTPException(status_code=404, detail="Member not found")
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")

@@ -22,7 +22,8 @@ app = FastAPI(docs_url=None, redoc_url=None)
 
 """Orins, the variable containing all the IP allowed to use the backend application in this case the only IP allowed is the ASCEPUPR Domain name"""
 origins = [
-    "https://ajeto.azurewebsites.net/"
+    "https://ajeto.azurewebsites.net/", 
+    "20.119.16.30"
 ]
 
 """Add the allowed origins IP's to the fastapi application variable """
