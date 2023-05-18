@@ -1,5 +1,5 @@
 import traceback
-from fastapi import Depends, FastAPI, HTTPException, Response
+from fastapi import Depends, FastAPI, HTTPException, Response, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from sqlalchemy.orm import Session
@@ -42,6 +42,16 @@ def get_db():
     finally:
         db.close()
 
+
+@app.middleware("http")
+async def block_localhost(request: Request, call_next):
+    client_host = request.client.host
+
+    if client_host == "127.0.0.1" or client_host == "::1":
+        raise HTTPException(status_code=403, detail="Access Forbidden from localhost")
+
+    response = await call_next(request)
+    return response
 
 @app.post("/")
 def m():
