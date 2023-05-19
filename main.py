@@ -17,8 +17,8 @@ Base.metadata.create_all(bind = engine)
 """To view documentation of the endpoints change the below variable to be 
     app = FastAPI()
 """
-app = FastAPI(docs_url=None, redoc_url=None)
-# app = FastAPI()
+# app = FastAPI(docs_url=None, redoc_url=None)
+app = FastAPI()
 
 
 """Orins, the variable containing all the IP allowed to use the backend application in this case the only IP allowed is the ASCEPUPR Domain name"""

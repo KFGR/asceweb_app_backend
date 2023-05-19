@@ -435,7 +435,7 @@ class Administrator_list_delete(Schema):
         if not value:
             raise ValueError("Emails list cannot be empty")
         
-        if len(value.emails) < 1:
+        if len(value) < 1:
             raise ValueError("Provide a list of emails")
         
         for email in value:
