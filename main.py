@@ -45,15 +45,15 @@ def get_db():
         db.close()
 
 
-# @app.middleware("http")
-# async def block_localhost(request: Request, call_next):
-#     client_host = request.client.host
+@app.middleware("http")
+async def block_localhost(request: Request, call_next):
+    client_host = request.client.host
 
-#     if client_host == "127.0.0.1" or client_host == "::1" or client_host == "localhost":
-#         raise HTTPException(status_code=403, detail="Access Forbidden from localhost")
+    if client_host == "127.0.0.1" or client_host == "::1" or client_host == "localhost":
+        raise HTTPException(status_code=403, detail="Access Forbidden from localhost")
 
-#     response = await call_next(request)
-#     return response
+    response = await call_next(request)
+    return response
 
 
 @app.post("/ascepupr/login/user/form/user/logintodashboard/", response_model=Administrators_Schemas.Administrator_Validate_User)
