@@ -228,7 +228,7 @@ def delete_list_members(token:str, emails:list, db: Session = Depends(get_db)):
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
-@app.delete("/ascepupr/dashboard/admin/table/delete/members/list/deletemembers/", response_model=Administrators_Schemas.Output_return)
+@app.delete("/ascepupr/dashboard/admin/table/delete/members/list/deletecompetitions/", response_model=Administrators_Schemas.Output_return)
 def delete_list_competitions(token:str, emails:list, db: Session = Depends(get_db)):
     try: 
         data = ta.delete_competitions_list(db=db,admin=Administrators_Schemas.Administrator_list_delete(masterAdminToken=token, emails=emails))
