@@ -23,7 +23,8 @@ app = FastAPI(docs_url=None, redoc_url=None)
 
 """Orins, the variable containing all the IP allowed to use the backend application in this case the only IP allowed is the ASCEPUPR Domain name"""
 origins = [
-    "https://ajeto.azurewebsites.net"
+    "https://ajeto.azurewebsites.net",
+    "20.119.16.30"
 ]
 
 """Add the allowed origins IP's to the fastapi application variable """
@@ -44,15 +45,15 @@ def get_db():
         db.close()
 
 
-@app.middleware("http")
-async def block_localhost(request: Request, call_next):
-    client_host = request.client.host
+# @app.middleware("http")
+# async def block_localhost(request: Request, call_next):
+#     client_host = request.client.host
 
-    if client_host == "127.0.0.1" or client_host == "::1" or client_host == "localhost":
-        raise HTTPException(status_code=403, detail="Access Forbidden from localhost")
+#     if client_host == "127.0.0.1" or client_host == "::1" or client_host == "localhost":
+#         raise HTTPException(status_code=403, detail="Access Forbidden from localhost")
 
-    response = await call_next(request)
-    return response
+#     response = await call_next(request)
+#     return response
 
 
 @app.post("/ascepupr/login/user/form/user/logintodashboard/", response_model=Administrators_Schemas.Administrator_Validate_User)
