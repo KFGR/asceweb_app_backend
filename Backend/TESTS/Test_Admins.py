@@ -146,6 +146,28 @@ def delete_members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INP
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")
 
+
+def delete_members_list(db: Session, admin: adminSchema.Administrator_list_delete):
+    admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
+    if admin_user:
+        if __sc.validateToken(admin_user[0], admin_user[1], admin.masterAdminToken) == [True, True] and (admin_user[1] == "MA" or admin_user[1] == "GA"):
+            deleted_emails = []
+            for email in admin.emails:
+                user_member = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == email).first()
+                if user_member:
+                    comp_member = db.query(Competitions_Table).filter(Competitions_Table.email == email).delete()
+                    if comp_member:
+                        user_member.competitions_form = "No"
+                    db.delete(user_member)
+                    deleted_emails.append(email)
+            db.commit()
+            if len(deleted_emails) > 0:
+                return "Users {} were deleted".format(deleted_emails)
+            raise HTTPException(status_code=404, detail="No users found with the provided emails") 
+        raise HTTPException(status_code=401, detail="Invalid administrator")
+    raise HTTPException(status_code=404, detail="Administrator not found")
+
+
 def delete_competitionsMember(db:Session, admin: adminSchema.Administrator_Delete_Entry_INPUTS):
     admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
     if admin_user:
@@ -158,6 +180,26 @@ def delete_competitionsMember(db:Session, admin: adminSchema.Administrator_Delet
                     return "User was deleted"
                 raise HTTPException(status_code=204, detail="No data deleted")
             raise HTTPException(status_code=404, detail="Member not found")
+        raise HTTPException(status_code=401, detail="Invalid administrator")
+    raise HTTPException(status_code=404, detail="Administrator not found")
+
+def delete_competitions_list(db: Session, admin: adminSchema.Administrator_list_delete):
+    admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
+    if admin_user:
+        if __sc.validateToken(admin_user[0], admin_user[1], admin.masterAdminToken) == [True, True] and (admin_user[1] == "MA" or admin_user[1] == "GA"):
+            deleted_emails = []
+            for email in admin.emails:
+                user_member = db.query(Competitions_Table).filter(Competitions_Table.email == email).first()
+                if user_member:
+                    comp_member = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == email).first()
+                    if comp_member:
+                        comp_member.competitions_form = "No"
+                    db.delete(user_member)
+                    deleted_emails.append(email)
+            db.commit()
+            if len(deleted_emails) > 0:
+                return "Users {} were deleted".format(deleted_emails)
+            raise HTTPException(status_code=404, detail="No users found with the provided emails") 
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")
 

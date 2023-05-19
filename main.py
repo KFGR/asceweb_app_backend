@@ -18,6 +18,7 @@ Base.metadata.create_all(bind = engine)
     app = FastAPI()
 """
 app = FastAPI(docs_url=None, redoc_url=None)
+# app = FastAPI()
 
 
 """Orins, the variable containing all the IP allowed to use the backend application in this case the only IP allowed is the ASCEPUPR Domain name"""
@@ -47,15 +48,12 @@ def get_db():
 async def block_localhost(request: Request, call_next):
     client_host = request.client.host
 
-    if client_host == "127.0.0.1" or client_host == "::1":
+    if client_host == "127.0.0.1" or client_host == "::1" or client_host == "localhost":
         raise HTTPException(status_code=403, detail="Access Forbidden from localhost")
 
     response = await call_next(request)
     return response
 
-@app.post("/")
-def m():
-    return "Hello World"
 
 @app.post("/ascepupr/login/user/form/user/logintodashboard/", response_model=Administrators_Schemas.Administrator_Validate_User)
 def loginAdmin(userName:str, passwd: SecretStr, db: Session = Depends(get_db)):
@@ -219,6 +217,27 @@ def deleteCompetitions(masterAdminToken: str, email: str, db:Session = Depends(g
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
+@app.delete("/ascepupr/dashboard/admin/table/delete/members/list/deletemembers/", response_model=Administrators_Schemas.Output_return)
+def delete_list_members(token:str, emails:list, db: Session = Depends(get_db)):
+    try: 
+        data = ta.delete_members_list(db=db,admin=Administrators_Schemas.Administrator_list_delete(masterAdminToken=token, emails=emails))
+        return {'status_code':HTTP_200_OK, 'body':data}
+    except (ValidationError, HTTPException, Exception) as e:
+        if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
+        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
+
+@app.delete("/ascepupr/dashboard/admin/table/delete/members/list/deletemembers/", response_model=Administrators_Schemas.Output_return)
+def delete_list_competitions(token:str, emails:list, db: Session = Depends(get_db)):
+    try: 
+        data = ta.delete_competitions_list(db=db,admin=Administrators_Schemas.Administrator_list_delete(masterAdminToken=token, emails=emails))
+        return {'status_code':HTTP_200_OK, 'body':data}
+    except (ValidationError, HTTPException, Exception) as e:
+        if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
+        elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+        elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+        else: return {"status_code":500, 'body':"Internal Server Error"}
 
 
 if __name__ == "__main__":

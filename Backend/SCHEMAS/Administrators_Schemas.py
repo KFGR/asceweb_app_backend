@@ -420,6 +420,32 @@ class Administrator_Delete_Entry_INPUTS(Schema):
     class Config:
         orm_mode = True
 
+class Administrator_list_delete(Schema):
+    masterAdminToken: str
+    emails: list
+
+    @validator('*', allow_reuse=True, pre=True)
+    def isEmpty(cls, value: str | dt.datetime):
+        if type(value) is str and (value == "" or value == None):
+            raise ValueError("None of the Fields can be empty!")
+        return value
+
+    @validator('emails', allow_reuse=True)
+    def validate_emails(cls, value: list):
+        if not value:
+            raise ValueError("Emails list cannot be empty")
+        
+        if len(value.emails) < 1:
+            raise ValueError("Provide a list of emails")
+        
+        for email in value:
+            if not email.strip():
+                raise ValueError("Emails cannot be empty strings")
+
+        return value
+    class Config:
+        orm_mode = True
+
 class Administrator_MasterAdminToken(Schema):
     masterAdminToken: str
 
