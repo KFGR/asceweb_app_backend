@@ -160,9 +160,10 @@ def delete_members_list(db: Session, admin: adminSchema.Administrator_list_delet
                         user_member.competitions_form = "No"
                     db.delete(user_member)
                     deleted_emails.append(email)
-            db.commit()
-            if len(deleted_emails) > 0:
-                return "Users {} were deleted".format(deleted_emails)
+                raise HTTPException(404, detail="No email {} found in table".format(email))
+        db.commit()
+        if len(deleted_emails) == len(admin.emails):
+            return "Users deleted"
             raise HTTPException(status_code=404, detail="No users found with the provided emails") 
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")
@@ -196,9 +197,10 @@ def delete_competitions_list(db: Session, admin: adminSchema.Administrator_list_
                         comp_member.competitions_form = "No"
                     db.delete(user_member)
                     deleted_emails.append(email)
+                raise HTTPException(404, detail="No email {} found in table".format(email))
             db.commit()
-            if len(deleted_emails) > 0:
-                return "Users {} were deleted".format(deleted_emails)
+            if len(deleted_emails) == len(admin.emails):
+                return "Users deleted"
             raise HTTPException(status_code=404, detail="No users found with the provided emails") 
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")
@@ -419,7 +421,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
                 
                 db.commit()
                 db.refresh(user_row)
-                return "data canged"
+                return "User updated"
             else:raise HTTPException(status_code=404, detail="No email found")
         else:raise HTTPException(status_code=401, detail="Invalid Administrator")
     raise Exception("Something went wrong") #goes directly to internal server error exception
