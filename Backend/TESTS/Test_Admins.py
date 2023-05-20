@@ -161,9 +161,10 @@ def delete_members_list(db: Session, admin: adminSchema.Administrator_list_delet
                     db.delete(user_member)
                     deleted_emails.append(email)
                 raise HTTPException(404, detail="No email {} found in table".format(email))
-        db.commit()
-        if len(deleted_emails) == len(admin.emails):
-            return "Users deleted"
+            
+            if len(deleted_emails) == len(admin.emails):
+                db.commit()
+                return "Users deleted"
             raise HTTPException(status_code=404, detail="No users found with the provided emails") 
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")
@@ -198,8 +199,9 @@ def delete_competitions_list(db: Session, admin: adminSchema.Administrator_list_
                     db.delete(user_member)
                     deleted_emails.append(email)
                 raise HTTPException(404, detail="No email {} found in table".format(email))
-            db.commit()
+            
             if len(deleted_emails) == len(admin.emails):
+                db.commit()
                 return "Users deleted"
             raise HTTPException(status_code=404, detail="No users found with the provided emails") 
         raise HTTPException(status_code=401, detail="Invalid administrator")
