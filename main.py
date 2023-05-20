@@ -227,7 +227,7 @@ def delete_list_members(token:str, emails:list, db: Session = Depends(get_db)):
         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':"Internal Server Error"}
+        else: return {"status_code":500, 'body':str(e)}
 
 @app.delete("/ascepupr/dashboard/admin/table/delete/members/list/deletecompetitions/", response_model=Administrators_Schemas.Output_return)
 def delete_list_competitions(token:str, emails:list, db: Session = Depends(get_db)):
@@ -238,7 +238,7 @@ def delete_list_competitions(token:str, emails:list, db: Session = Depends(get_d
         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
-        else: return {"status_code":500, 'body':"Internal Server Error"}
+        else: return {"status_code":500, 'body':str(e)}
 
 
 if __name__ == "__main__":

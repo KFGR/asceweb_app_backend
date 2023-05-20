@@ -259,7 +259,7 @@ def updateAdmin(db: Session, admin: adminSchema.Administrator_ChangePasswdEmail_
 def updateCompetitionsMembers(db: Session, user:adminSchema.Competitions_update):
     if not ValidateExist(db=db,table="UpdateCompetitionsSignUp", user=user):
         admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(user.masterAdminToken)['username']).first()
-        if admin_user and __sc.validateToken(admin_user[0], admin_user[1], user.masterAdminToken) == [True, True] and admin_user[1] == "MA":
+        if admin_user and __sc.validateToken(admin_user[0], admin_user[1], user.masterAdminToken) == [True, True] and admin_user[1] == "MA" or admin_user[1] == "GA":
             user_row = db.query(Competitions_Table).filter(Competitions_Table.email == user.email).first()
             if user_row:
                 user_chapter_row = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == user.email).first()
@@ -367,7 +367,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
     """Email, phone and id are unique"""
     if not ValidateExist(db=db,table="UpdateChapterMember", user=user):
         admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level).filter(Administrators_Table.username == __sc.decodeToken(user.masterAdminToken)['username']).first()
-        if admin_user and __sc.validateToken(admin_user[0], admin_user[1], user.masterAdminToken) == [True, True] and admin_user[1] == "MA":
+        if admin_user and __sc.validateToken(admin_user[0], admin_user[1], user.masterAdminToken) == [True, True] and admin_user[1] == "MA" or admin_user[1] == "GA":
             user_row = db.query(Chapter_Members_Table).filter(Chapter_Members_Table.email == user.email).first()
             if user_row:
                 if not (user.newEmail or user.newPhone or user.newTshirt_size or user.newAge or user.newBachelor or user.newDepartment or user.newAca_years or user.newMembershipPaid):
