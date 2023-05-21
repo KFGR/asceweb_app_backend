@@ -114,7 +114,7 @@ def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminTo
             members = db.query(Chapter_Members_Table).all()
             if members:
                 for member in members:
-                    if member.membership_until <= str(dt.now().date()):
+                    if member.membership_until <= str(dt.now()):
                         member.membership_until = 'Expired'
                 db.commit()
                 return [adminSchema.get_SignUp_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,tshirt_size=entry.tshirt_size,age=entry.age,bachelor=entry.bachelor,department=entry.department,type=entry.type,created_at=entry.created_at,competitions_form=entry.competitions_form,aca_years=entry.aca_years,membership_paid=entry.membership_paid,membership_until=entry.membership_until) for entry in members]
