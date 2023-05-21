@@ -146,7 +146,6 @@ def delete_members(db:Session, admin: adminSchema.Administrator_Delete_Entry_INP
         raise HTTPException(status_code=401, detail="Invalid administrator")
     raise HTTPException(status_code=404, detail="Administrator not found")
 
-
 def delete_members_list(db: Session, admin: adminSchema.Administrator_list_delete):
     admin_user = db.query(Administrators_Table.username, Administrators_Table.admin_level, Administrators_Table.email).filter(Administrators_Table.username == __sc.decodeToken(admin.masterAdminToken)['username']).first()
     if admin_user:

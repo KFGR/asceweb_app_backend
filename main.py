@@ -196,6 +196,17 @@ def deleteAdmin(masterAdminToken: str, email: str, db:Session = Depends(get_db))
         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
+# @app.delete("/ascepupr/dashboard/admin/table/delete/members/deletemembers/", status_code=HTTP_200_OK,response_model=Administrators_Schemas.Output_return)
+# def deleteMembers(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
+#     try:
+#         data = ta.delete_members(db=db, admin = Administrators_Schemas.Administrator_Delete_Entry_INPUTS(masterAdminToken=masterAdminToken, email=email))
+#         return {"status_code":HTTP_200_OK, 'body':data}
+#     except (ValidationError, HTTPException, Exception) as e:
+#         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
+#         elif type(e) == DecodeError or type(e) == InvalidSignatureError: return {"status_code":401, 'body':str(e)}
+#         elif type(e) == HTTPException: return {"status_code":e.status_code, 'body':e.detail}
+#         else: return {"status_code":500, 'body':"Internal Server Error"}
+
 @app.delete("/ascepupr/dashboard/admin/table/delete/members/deletemembers/", status_code=HTTP_200_OK,response_model=Administrators_Schemas.Output_return)
 def deleteMembers(masterAdminToken: str, email: str, db:Session = Depends(get_db)):
     try:
@@ -219,9 +230,10 @@ def deleteCompetitions(masterAdminToken: str, email: str, db:Session = Depends(g
         else: return {"status_code":500, 'body':"Internal Server Error"}
 
 @app.delete("/ascepupr/dashboard/admin/table/delete/members/list/deletemembers/", response_model=Administrators_Schemas.Output_return)
-def delete_list_members(token:str, emails:list, db: Session = Depends(get_db)):
+def delete_list_members(token:str, emails:str, db: Session = Depends(get_db)):
     try: 
-        data = ta.delete_members_list(db=db,admin=Administrators_Schemas.Administrator_list_delete(masterAdminToken=token, emails=emails))
+        data_list = emails.split(',')
+        data = ta.delete_members_list(db=db,admin=Administrators_Schemas.Administrator_list_delete(masterAdminToken=token, emails=data_list))
         return {'status_code':HTTP_200_OK, 'body':data}
     except (ValidationError, HTTPException, Exception) as e:
         if type(e) == ValidationError: return {'status_code':422 ,'body':"Invalid {}".format(str(e).split('\n')[1])}
