@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_, exc
+from datetime import timedelta
 from Backend.DATABASE.Administrators_Table import Administrators_Table
 from Backend.DATABASE.Chapter_Members_Table import Chapter_Members_Table
 from Backend.DATABASE.Competitions_Table import Competitions_Table
@@ -9,6 +10,7 @@ from fastapi import HTTPException
 from typing import Union
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
+import pytz
 __sc = sc()
 '''
     If working properly, functions to be moved elsewhere in the future.
@@ -419,7 +421,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
                     if user.newMembershipPaid != user_row.membership_paid:
                         user_row.membership_paid = user.newMembershipPaid
                         if user.newMembershipPaid == "Yes":
-                            user_row.membership_until = str(dt.now().date() + relativedelta(minute=2))
+                            user_row.membership_until = str(dt.now(pytz.timezone('America/Puerto_Rico')) + dt.timedelta(min=2))
                         else:
                             user_row.membership_until = "Expired"
                     else: raise HTTPException(status_code=409, detail="This user is already using this membership value")
