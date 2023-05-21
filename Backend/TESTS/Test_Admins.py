@@ -113,6 +113,10 @@ def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminTo
         if __sc.validateToken(admin_user[0],admin_user[1],admin.masterAdminToken) == [True, True] and admin_user[1] == "MA" or  admin_user[1] == "GA":
             members = db.query(Chapter_Members_Table).all()
             if members:
+                for member in members:
+                    if member.membership_until <= str(dt.now().date()):
+                        member.membership_until = 'Expired'
+                db.commit()
                 return [adminSchema.get_SignUp_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,tshirt_size=entry.tshirt_size,age=entry.age,bachelor=entry.bachelor,department=entry.department,type=entry.type,created_at=entry.created_at,competitions_form=entry.competitions_form,aca_years=entry.aca_years,membership_paid=entry.membership_paid,membership_until=entry.membership_until) for entry in members]
             raise HTTPException(status_code=400, detail="No data was found")
         raise HTTPException(status_code=401, detail="Invalid Administrator")
@@ -415,7 +419,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
                     if user.newMembershipPaid != user_row.membership_paid:
                         user_row.membership_paid = user.newMembershipPaid
                         if user.newMembershipPaid == "Yes":
-                            user_row.membership_until = str(dt.now().date() + relativedelta(years=1))
+                            user_row.membership_until = str(dt.now().date() + relativedelta(minute=2))
                         else:
                             user_row.membership_until = "Expired"
                     else: raise HTTPException(status_code=409, detail="This user is already using this membership value")
