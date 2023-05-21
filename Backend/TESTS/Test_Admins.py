@@ -421,7 +421,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
                     if user.newMembershipPaid != user_row.membership_paid:
                         user_row.membership_paid = user.newMembershipPaid
                         if user.newMembershipPaid == "Yes":
-                            user_row.membership_until = str(dt.now(pytz.timezone('America/Puerto_Rico')) + dt.timedelta(min=2))
+                            user_row.membership_until = str(dt.now(pytz.timezone('America/Puerto_Rico')) + timedelta(min=2))
                         else:
                             user_row.membership_until = "Expired"
                     else: raise HTTPException(status_code=409, detail="This user is already using this membership value")
