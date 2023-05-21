@@ -441,7 +441,7 @@ class Administrator_list_delete(Schema):
         for email in value:
             if not email.strip():
                 raise ValueError("Emails cannot be empty strings")
-            if not email.split('@') in ('students.pupr.edu', 'pupr.edu'):
+            if not email.split('@')[1] in ('students.pupr.edu', 'pupr.edu'):
                 raise ValueError("Invalid Email")
 
         return value
