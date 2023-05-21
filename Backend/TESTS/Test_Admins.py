@@ -159,7 +159,7 @@ def delete_members_list(db: Session, admin: adminSchema.Administrator_list_delet
                         user_member.competitions_form = "No"
                     db.delete(user_member)
                     deleted_emails.append(email)
-                raise HTTPException(404, detail="No email {} found in table".format(email))
+                else:raise HTTPException(404, detail="No email {} found in table".format(email))
             
             if len(deleted_emails) == len(admin.emails):
                 db.commit()
@@ -197,7 +197,7 @@ def delete_competitions_list(db: Session, admin: adminSchema.Administrator_list_
                         comp_member.competitions_form = "No"
                     db.delete(user_member)
                     deleted_emails.append(email)
-                raise HTTPException(404, detail="No email {} found in table".format(email))
+                else:raise HTTPException(404, detail="No email {} found in table".format(email))
             
             if len(deleted_emails) == len(admin.emails):
                 db.commit()
