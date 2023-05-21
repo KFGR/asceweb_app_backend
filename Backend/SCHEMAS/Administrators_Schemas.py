@@ -435,12 +435,14 @@ class Administrator_list_delete(Schema):
         if not value:
             raise ValueError("Emails list cannot be empty")
         
-        if len(value) < 1:
+        if len(value) < 2:
             raise ValueError("Provide a list of emails")
         
         for email in value:
             if not email.strip():
                 raise ValueError("Emails cannot be empty strings")
+            if not email.split('@') in ('students.pupr.edu', 'pupr.edu'):
+                raise ValueError("Invalid Email")
 
         return value
     class Config:
