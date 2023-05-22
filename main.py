@@ -22,19 +22,18 @@ app = FastAPI()
 
 
 """Orins, the variable containing all the IP allowed to use the backend application in this case the only IP allowed is the ASCEPUPR Domain name"""
-# origins = [
-#     "https://ajeto.azurewebsites.net",
-#     "20.119.16.30"
-# ]
+origins = [
+    "https://www.examdev.net/"
+]
 
-# """Add the allowed origins IP's to the fastapi application variable """
-# app.add_middleware(
-#     # CORSMiddleware(origins,allow_methods=["*"], allow_headers=["*"])
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_methods=["*"],
-#     allow_headers=["*"]
-# )
+"""Add the allowed origins IP's to the fastapi application variable """
+app.add_middleware(
+    # CORSMiddleware(origins,allow_methods=["*"], allow_headers=["*"])
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
 
 #dependency
 def get_db():
