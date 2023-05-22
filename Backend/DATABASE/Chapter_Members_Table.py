@@ -45,7 +45,7 @@ class Chapter_Members_Table(Base):
     competitions_form = Column(Enum('Yes','No'), nullable=False)
     aca_years = Column(Integer, nullable=False)
     membership_paid = Column(Enum('Yes','No'), nullable=False)
-    membership_until = Column(String(25), nullable=False)
+    membership_until = Column(String(50), nullable=False)
     # competitions = relationship("Competitions_Table", backref="chapter_member", foreign_keys="[Competitions_Table.idchapter_members, Competitions_Table.email, Competitions_Table.phone]", cascade="all, delete-orphan")
 
     competitions = relationship("Competitions_Table",backref='chapter_members',foreign_keys=[Competitions_Table.idchapter_members, Competitions_Table.name, Competitions_Table.email, Competitions_Table.phone], primaryjoin="and_(Chapter_Members_Table.idchapter_members==Competitions_Table.idchapter_members, Chapter_Members_Table.name==Competitions_Table.name, Chapter_Members_Table.email==Competitions_Table.email, Chapter_Members_Table.phone==Competitions_Table.phone)", cascade="all, delete-orphan")

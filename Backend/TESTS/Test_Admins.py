@@ -9,6 +9,8 @@ from fastapi import HTTPException
 from typing import Union
 from datetime import datetime as dt
 from dateutil.relativedelta import relativedelta
+import pytz
+from datetime import timedelta
 __sc = sc()
 '''
     If working properly, functions to be moved elsewhere in the future.
@@ -114,11 +116,10 @@ def get_SignUp_Table(db: Session, admin: adminSchema.Administrator_MasterAdminTo
             members = db.query(Chapter_Members_Table).all()
             if members:
                 for member in members:
-                    if member.membership_until <= str(dt.now()):
+                    if member.membership_until <= str(dt.now(pytz.timezone("America/Puerto_Rico"))) and member.membership_until != "Expired":
                         member.membership_until = 'Expired'
                         member.membership_paid = 'No'
                 db.commit()
-                db.refresh()
                 return [adminSchema.get_SignUp_Data(idchapter_members=entry.idchapter_members,name=entry.name,email=entry.email,phone=entry.phone,tshirt_size=entry.tshirt_size,age=entry.age,bachelor=entry.bachelor,department=entry.department,type=entry.type,created_at=entry.created_at,competitions_form=entry.competitions_form,aca_years=entry.aca_years,membership_paid=entry.membership_paid,membership_until=entry.membership_until) for entry in members]
             raise HTTPException(status_code=400, detail="No data was found")
         raise HTTPException(status_code=401, detail="Invalid Administrator")
@@ -421,7 +422,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
                     if user.newMembershipPaid != user_row.membership_paid:
                         user_row.membership_paid = user.newMembershipPaid
                         if user.newMembershipPaid == "Yes":
-                            user_row.membership_until = str(dt.now().date() + relativedelta(minute=2))
+                            user_row.membership_until = str(dt.now(pytz.timezone("America/Puerto_Rico")) + timedelta(minutes=2))
                         else:
                             user_row.membership_until = "Expired"
                     else: raise HTTPException(status_code=409, detail="This user is already using this membership value")

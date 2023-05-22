@@ -17,7 +17,7 @@ Base.metadata.create_all(bind = engine)
 """To view documentation of the endpoints change the below variable to be 
     app = FastAPI()
 """
-# app = FastAPI(docs_url=None, redoc_url=None)
+# app = FastAPI(docs_url=None, redoc_urcl=None)
 app = FastAPI()
 
 
