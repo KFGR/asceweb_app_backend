@@ -436,7 +436,7 @@ def updateMembers(db: Session, user:adminSchema.Member_update):
     
 def isTokenValid(db: Session, admin=adminSchema.Administrator_MasterAdminToken):
     """cambiar esta funcion para buscar que el admin realmente este en la tabla"""
-    if admin.token:
+    if admin.masterAdminToken:
         tokenDict = __sc.decodeToken(admin.masterAdminToken)
         if __sc.validateToken(tokenDict["username"], tokenDict["level"], admin.masterAdminToken) == [True,True]:
             admin_user = db.query(Administrators_Table).filter(Administrators_Table.username==tokenDict['username']).first()
